@@ -1,6 +1,9 @@
 import { app, BrowserWindow, ipcMain, session } from 'electron';
 import { join } from 'path';
 import { setupIPCHandles } from './ipchandle';
+import { initialize, enable } from '@electron/remote/main';
+
+initialize();
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -11,11 +14,13 @@ function createWindow() {
         transparent: false,
         frame: false,
         webPreferences: {
-            preload: join(__dirname, 'preload.js'),
+            // preload: join(__dirname, 'preload.js'),
             nodeIntegration: true,
-            contextIsolation: true,
+            contextIsolation: false,
         }
     });
+
+    enable(mainWindow.webContents);
 
     if (process.env.NODE_ENV === 'development') {
         const rendererPort = process.argv[2];

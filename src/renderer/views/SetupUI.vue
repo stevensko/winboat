@@ -27,8 +27,8 @@
             <Transition name="bouncedown" mode="out-in">
                 <div :key="currentStepIdx" id="stepContent" class="overflow-scroll">
                     <!-- Welcome -->
-                    <div v-if="currentStep.id === StepID.WELCOME" class="flex flex-col gap-4 h-full">
-                        <h1 class="text-3xl font-semibold">Welcome to WinBoat</h1>
+                    <div v-if="currentStep.id === StepID.WELCOME" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
                             WinBoat is a full fledged app that helps you natively run Windows applications on your Linux machine with ease.
                         </p>
@@ -41,8 +41,8 @@
                     </div>
     
                     <!-- License -->
-                    <div v-if="currentStep.id === StepID.LICENSE" class="flex flex-col gap-4 h-full">
-                        <h1 class="text-3xl font-semibold">License Agreement</h1>
+                    <div v-if="currentStep.id === StepID.LICENSE" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
                             WinBoat is open-source software licensed under the MIT License. Please review the license agreement below.
                         </p>
@@ -54,8 +54,8 @@
                     </div>
 
                     <!-- Pre-Requisites -->
-                    <div v-if="currentStep.id === StepID.PREREQUISITES" class="flex flex-col gap-4 h-full">
-                        <h1 class="text-3xl font-semibold">Pre-Requisites</h1>
+                    <div v-if="currentStep.id === StepID.PREREQUISITES" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
                             In order to run WinBoat, your computer must meet the following requirements.
                         </p>
@@ -82,6 +82,13 @@
                                 Docker installed
                                 <a href="https://docs.docker.com/get-docker/" target="_blank" class="text-violet-400 hover:underline ml-1">How?</a>
                             </li>
+                            <li class="flex items-center gap-2">
+                                <span v-if="specs.ipTablesLoaded && specs.iptableNatLoaded" class="text-green-500">✔</span>
+                                <span v-else class="text-red-500">✘</span>
+                                <span class="font-mono bg-neutral-700 rounded-md px-0.5">iptables</span> and 
+                                <span class="font-mono bg-neutral-700 rounded-md px-0.5">iptable_nat</span> modules loaded
+                                <a href="https://docs.docker.com/get-docker/" target="_blank" class="text-violet-400 hover:underline ml-1">How?</a>
+                            </li>                            
                         </ul>
                         <div class="flex flex-row gap-4 mt-6">
                             <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
@@ -89,7 +96,7 @@
                                 toggled 
                                 class="px-6" 
                                 @click="currentStepIdx++" 
-                                :disabled="!(specs.ramGB >= 4 && specs.cpuThreads >= 2 && specs.kvmEnabled && specs.dockerInstalled)"
+                                :disabled="!(specs.ramGB >= 4 && specs.cpuThreads >= 2 && specs.kvmEnabled && specs.dockerInstalled && specs.ipTablesLoaded && specs.iptableNatLoaded)"
                             >
                                 Next
                             </x-button>
@@ -97,8 +104,8 @@
                     </div>
     
                     <!-- Windows Configuration -->
-                    <div v-if="currentStep.id === StepID.WINDOWS_CONFIG" class="flex flex-col gap-4 h-full">
-                        <h1 class="text-3xl font-semibold">Configure Windows</h1>
+                    <div v-if="currentStep.id === StepID.WINDOWS_CONFIG" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
                             Pick the version of Windows you want to install, and the language you'd like to use.
                         </p>
@@ -145,10 +152,70 @@
                             <x-button toggled class="px-6" @click="currentStepIdx++">Next</x-button>
                         </div>
                     </div>
+
+                    <!-- User Configuration -->
+                    <div v-if="currentStep.id === StepID.USER_CONFIG" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
+                        <p class="text-lg text-gray-400">
+                            Configure the username and password for the Windows user account.
+                        </p>
+    
+                        <p class="text-lg text-gray-400">
+                            These credentials will be used to log in to the Windows virtual machine and to access it through Remote Desktop Protocol (RDP).
+                            You will not be able to change these settings later on unless you reinstall.
+                        </p>
+    
+    
+                        <div>
+                            <label for="select-username" class="text-sm mb-4 text-neutral-400">Username</label>
+                            <x-input
+                                id="select-username"
+                                class="w-64 max-w-64"
+                                type="text"
+                                minlength="2"
+                                maxlength="32"
+                                required 
+                                size="large"
+                                :value="username"
+                                @input="(e: any) => username = e.target.value"
+                            >
+                                <x-icon href="#person"></x-icon>
+                                <x-label>Name</x-label>
+                            </x-input>
+                        </div>
+    
+                        <div>
+                            <label for="select-password" class="text-sm mb-4 text-neutral-400">Password</label>
+                            <x-input 
+                                id="select-password" 
+                                class="w-64 max-w-64" 
+                                type="password" 
+                                minlength="2" 
+                                maxlength="64"
+                                required 
+                                size="large"
+                                :value="password"
+                                @input="(e: any) => password = e.target.value"
+                            >
+                                <x-icon href="#lock"></x-icon>
+                                <x-label>Password</x-label>
+                            </x-input>
+                        </div>
+    
+                        <div class="flex flex-row gap-4 mt-6">
+                            <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
+                            <x-button
+                                :disabled="username.length < 2 || password.length < 2"
+                                toggled
+                                class="px-6"
+                                @click="currentStepIdx++"
+                            >Next</x-button>
+                        </div>
+                    </div>
     
                     <!-- Hardware Configuration -->
-                    <div v-if="currentStep.id === StepID.HARDWARE_CONFIG" class="flex flex-col gap-4 h-full">
-                        <h1 class="text-3xl font-semibold">Hardware Configuration</h1>
+                    <div v-if="currentStep.id === StepID.HARDWARE_CONFIG" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
                             WinBoat utilizes a containerized KVM virtual machine to run Windows applications. Please configure the hardware settings for the virtual machine.
                         </p>
@@ -197,14 +264,14 @@
                                 <div class="flex flex-row gap-4 items-center">
                                     <x-slider
                                         id="select-disk"
-                                        @change="(e: any) => diskGB = Number(e.target.value)"
+                                        @change="(e: any) => diskSpaceGB = Number(e.target.value)"
                                         class="w-[50%]"
-                                        :value="diskGB"
+                                        :value="diskSpaceGB"
                                         :min="MIN_DISK_GB"
                                         :max="specs.diskSpaceGB"
                                         step="8"
                                     ></x-slider>
-                                    <x-label>{{ diskGB }} GB</x-label>
+                                    <x-label>{{ diskSpaceGB }} GB</x-label>
                                 </div>
                             </div>
                         </div>
@@ -217,8 +284,8 @@
                     </div>
     
                     <!-- Review -->
-                    <div v-if="currentStep.id === StepID.REVIEW" class="flex flex-col gap-6 h-full">
-                        <h1 class="text-3xl font-semibold text-white">Review</h1>
+                    <div v-if="currentStep.id === StepID.REVIEW" class="step-block">
+                        <h1 class="text-3xl font-semibold">{{ currentStep.title }}</h1>
                         <p class="text-lg text-gray-400">
                             Please review the settings you've chosen for your WinBoat installation. If everything looks correct, click "Install" to begin.
                         </p>
@@ -245,29 +312,55 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="text-sm text-gray-400">Disk Size</span>
-                                    <span class="text-base text-white">{{ diskGB }} GB</span>
+                                    <span class="text-base text-white">{{ diskSpaceGB }} GB</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-gray-400">Username</span>
+                                    <span class="text-base text-white">{{ username }}</span>
                                 </div>
                             </div>
                         </div>
     
                         <div class="flex flex-row gap-4 mt-6">
                             <x-button class="px-6" @click="currentStepIdx--">Back</x-button>
-                            <x-button toggled class="px-6" @click="currentStepIdx++">Install</x-button>
+                            <x-button toggled class="px-6" @click="currentStepIdx++; install()">Install</x-button>
                         </div>
                     </div>
     
                     <!-- Installation -->
-                    <div v-if="currentStep.id === StepID.INSTALL" class="flex flex-col gap-4 h-full">
+                    <div v-if="currentStep.id === StepID.INSTALL" class="step-block">
                         <h1 class="text-3xl font-semibold">Installation</h1>
                         <p class="text-lg text-gray-400">
                             WinBoat is now installing Windows. Please be patient as this may take up to an hour.
-                            In the meantime you can grab coffee and check the status <a href="#">in your browser</a>.
+                            In the meantime you can grab coffee and check the status <a href="http://127.0.0.1:8006" @click="openAnchorLink">in your browser</a>.
                         </p>
     
-                        <div class="flex flex-col h-full items-center justify-center gap-4">
+                        <!-- Installing -->
+                        <div v-if="installState !== InstallStates.COMPLETED && installState !== InstallStates.INSTALL_ERROR" class="flex flex-col h-full items-center justify-center gap-4">
                             <x-throbber class="size-16"></x-throbber>
-                            <x-label class="text-lg text-gray-400">Deploying container...</x-label>
+                            <x-label v-if="installState !== InstallStates.MONITORING_PREINSTALL" class="text-lg text-gray-400 text-center">
+                                {{ installState }}...
+                            </x-label>
+                            <x-label v-else class="text-lg text-gray-400 text-center">
+                                {{ preinstallMsg }}
+                            </x-label>
                         </div>
+
+                        <!-- Error -->
+                         <div v-if="installState === InstallStates.INSTALL_ERROR" class="flex flex-col h-full items-center justify-center gap-4">
+                            <Icon icon="line-md:alert" class="size-16 text-red-500"></Icon>
+                            <x-label class="text-lg text-gray-400 text-center">
+                                An error occurred while installing Windows. Please check the logs for more information.
+                            </x-label>
+                        </div>
+
+                        <!-- Completed -->
+                         <div v-if="installState === InstallStates.COMPLETED" class="flex flex-col h-full items-center justify-center gap-4">
+                            <Icon icon="line-md:confirm-circle" class="size-16 text-green-500"></Icon>
+                            <x-label class="text-lg text-gray-400 text-center">
+                                Windows has been installed successfully!
+                            </x-label>
+                         </div>
                     </div>
                 </div>
             </Transition>
@@ -279,7 +372,12 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { computed, onMounted, ref } from 'vue';
-import { Specs } from '../../types';
+import { InstallConfiguration, Specs } from '../../types';
+import { getSpecs } from '../lib/specs';
+import { WINDOWS_VERSIONS, WINDOWS_LANGUAGES, type WindowsVersionKey } from "../lib/constants";
+import { InstallManager, type InstallState, InstallStates } from '../lib/install';
+import { openAnchorLink } from '../utils/openLink';
+const os: typeof import('os') = require('os');
 
 type Step = {
     id: string,
@@ -293,6 +391,7 @@ enum StepID {
     LICENSE = "STEP_LICENSE",
     WINDOWS_CONFIG = "STEP_WINDOWS_CONFIG",
     HARDWARE_CONFIG = "STEP_HARDWARE_CONFIG",
+    USER_CONFIG = "STEP_USER_CONFIG",
     REVIEW = "STEP_OVERVIEW",
     INSTALL = "STEP_INSTALL",
     FINISH = "STEP_FINISH",
@@ -301,23 +400,28 @@ enum StepID {
 const steps: Step[] = [
     {
         id: StepID.WELCOME,
-        title: "Welcome",
+        title: "Welcome to WinBoat",
         icon: "tdesign:wave-bye-filled",
     },
     {
         id: StepID.LICENSE,
-        title: "License",
+        title: "License Agreement",
         icon: "line-md:text-box-multiple",
     },
     {
         id: StepID.PREREQUISITES,
-        title: "Prerequisites",
+        title: "Pre-Requisites",
         icon: "line-md:check-all",
     },
     {
         id: StepID.WINDOWS_CONFIG,
-        title: "Windows Configuration",
+        title: "Configure Windows",
         icon: "mage:microsoft-windows",
+    },
+    {
+        id: StepID.USER_CONFIG,
+        title: "User Configuration",
+        icon: "line-md:account",
     },
     {
         id: StepID.HARDWARE_CONFIG,
@@ -341,51 +445,6 @@ const steps: Step[] = [
     },
 ]
 
-const WINDOWS_VERSIONS = {
-    "11": "Windows 11 Pro",
-    "11l": "Windows 11 Pro LTSC",
-    "11e": "Windows 11 Enterprise",
-    "10": "Windows 10 Pro",
-    "10l": "Windows 10 Pro LTSC",
-    "10e": "Windows 10 Enterprise",
-}
-
-const WINDOWS_LANGUAGES = {
-    "🇦🇪 Arabic": "Arabic" ,
-    "🇧🇬 Bulgarian": "Bulgarian" ,
-    "🇨🇳 Chinese": "Chinese" ,
-    "🇭🇷 Croatian": "Croatian" ,
-    "🇨🇿 Czech": "Czech" ,
-    "🇩🇰 Danish": "Danish" ,
-    "🇳🇱 Dutch": "Dutch" ,
-    "🇬🇧 English": "English" ,
-    "🇪🇪 Estonian": "Estonian" ,
-    "🇫🇮 Finnish": "Finnish" ,
-    "🇫🇷 French": "French" ,
-    "🇩🇪 German": "German" ,
-    "🇬🇷 Greek": "Greek" ,
-    "🇮🇱 Hebrew": "Hebrew" ,
-    "🇭🇺 Hungarian": "Hungarian" ,
-    "🇮🇹 Italian": "Italian" ,
-    "🇯🇵 Japanese": "Japanese" ,
-    "🇰🇷 Korean": "Korean" ,
-    "🇱🇻 Latvian": "Latvian" ,
-    "🇱🇹 Lithuanian": "Lithuanian" ,
-    "🇳🇴 Norwegian": "Norwegian" ,
-    "🇵🇱 Polish": "Polish" ,
-    "🇵🇹 Portuguese": "Portuguese" ,
-    "🇷🇴 Romanian": "Romanian" ,
-    "🇷🇺 Russian": "Russian" ,
-    "🇷🇸 Serbian": "Serbian" ,
-    "🇸🇰 Slovak": "Slovak" ,
-    "🇸🇮 Slovenian": "Slovenian" ,
-    "🇪🇸 Spanish": "Spanish" ,
-    "🇸🇪 Swedish": "Swedish" ,
-    "🇹🇭 Thai": "Thai" ,
-    "🇹🇷 Turkish": "Turkish" ,
-    "🇺🇦 Ukrainian": "Ukrainian"
-}
-
 const MIN_CPU_THREADS = 1;
 const MIN_RAM_GB = 2;
 const MIN_DISK_GB = 32;
@@ -396,23 +455,56 @@ const specs = ref<Specs>({
     ramGB: 0,
     diskSpaceGB: 0,
     kvmEnabled: false,
-    dockerInstalled: false
+    dockerInstalled: false,
+    ipTablesLoaded: false,
+    iptableNatLoaded: false
 })
-const currentStepIdx = ref(0);
+const currentStepIdx = ref(3);
 const currentStep = computed(() => steps[currentStepIdx.value]);
-const windowsVersion = ref("11");
+const windowsVersion = ref<WindowsVersionKey>("11");
 const windowsLanguage = ref("English");
 const cpuThreads = ref(2);
 const ramGB = ref(4);
-const diskGB = ref(32);
-
+const diskSpaceGB = ref(32);
+const username = ref("winboat");
+const password = ref("");
+const installState = ref<InstallState>(InstallStates.IDLE);
+const preinstallMsg = ref("");
 
 onMounted(async () => {
     const licenseRes = await fetch("/LICENSE.txt");
     license.value = await licenseRes.text();
-    specs.value = await window.electronAPI.specs();
+    specs.value = await getSpecs();
     console.log("Specs", specs.value);
+    username.value = os.userInfo().username;
+    console.log("Username", username.value);
 })
+
+function install() {
+    const installConfig: InstallConfiguration = {
+        windowsVersion: windowsVersion.value,
+        windowsLanguage: windowsLanguage.value,
+        cpuThreads: cpuThreads.value,
+        ramGB: ramGB.value,
+        diskSpaceGB: diskSpaceGB.value,
+        username: username.value,
+        password: password.value,
+    }
+
+    // Begin installation and attach event listeners
+    const installManager = new InstallManager(installConfig);
+    installManager.emitter.on("stateChanged", newState => {
+        installState.value = newState;
+        console.log("Install state changed", newState);
+    });
+
+    installManager.emitter.on("preinstallMsg", msg => {
+        preinstallMsg.value = msg;
+        console.log("Preinstall msg", msg);
+    });
+
+    installManager.install();
+}
 </script>
 
 <style>
@@ -425,6 +517,16 @@ onMounted(async () => {
     filter: blur(50px);
 }
 
+.step-block {
+    @apply flex flex-col gap-4 h-full justify-center;
+}
+
+.flex p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/* Transitions */
 .bounce-enter-active {
   animation: bounce-in 0.4s;
 }

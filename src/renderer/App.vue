@@ -52,6 +52,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { routes } from './router';
 import { Icon } from '@iconify/vue';
 import { onMounted } from 'vue';
+const { BrowserWindow }: typeof import('@electron/remote') = require('@electron/remote')
 
 onMounted(() => {
     useRouter().push('/setup')
@@ -63,16 +64,20 @@ function handleMinimize() {
 }
 
 function handleTitleBarEvent(e: CustomEvent) {
-    console.log("ClickEvt", e);
+    console.log("TitleBarEvt", e);
     switch(e.detail) {
         case "close":
-            window.electronAPI.closeWindow();
+            BrowserWindow.getFocusedWindow()!.close();
             break;
         case "maximize":
-            window.electronAPI.maximizeWindow();
+            if (BrowserWindow.getFocusedWindow()!.isMaximized()) {
+                BrowserWindow.getFocusedWindow()!.unmaximize();
+            } else {
+                BrowserWindow.getFocusedWindow()!.maximize();
+            }
             break;
         case "minimize":
-            window.electronAPI.minimizeWindow();
+            BrowserWindow.getFocusedWindow()!.minimize();
             break;
     }
 }
