@@ -28,6 +28,9 @@
                         <x-label>{{ route.name }}</x-label>
                     </x-navitem>
                 </RouterLink>
+                <div class="flex flex-col items-center justify-end h-full p-4">
+                    <p class="text-xs text-neutral-500">WinBoat Pre-Release Alpha {{ appVer }}</p>
+                </div>
             </x-nav>
             <div class="px-5 flex-grow max-h-[calc(100vh-2rem)] overflow-y-auto pb-4">
                 <div class="flex flex-row items-center gap-2 my-6">
@@ -63,6 +66,7 @@ const path: typeof import('path') = require('path')
 const remote: typeof import('@electron/remote') = require('@electron/remote');
 
 const $router = useRouter();
+const appVer = import.meta.env.VITE_APP_VERSION;
 
 onMounted(async () => {
     console.log("WinBoat app path:", path.join(remote.app.getAppPath(), "..", ".."));

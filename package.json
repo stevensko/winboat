@@ -1,7 +1,7 @@
 {
     "name": "winboat",
     "version": "0.1.0",
-    "description": "A minimal Electron + Vue application",
+    "description": "Windows Apps on Linux",
     "main": "main/main.js",
     "scripts": {
         "dev": "node scripts/dev-server.js",
