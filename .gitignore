@@ -5,3 +5,6 @@ build
 .vscode
 .idea
 src/renderer/public/*
+
+# Custom
+*.exe

@@ -360,6 +360,7 @@
                             <x-label class="text-lg text-gray-400 text-center">
                                 Windows has been installed successfully!
                             </x-label>
+                            <x-button @click="$router.push('/')">Finish</x-button>
                          </div>
                     </div>
                 </div>
@@ -372,6 +373,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { InstallConfiguration, Specs } from '../../types';
 import { getSpecs } from '../lib/specs';
 import { WINDOWS_VERSIONS, WINDOWS_LANGUAGES, type WindowsVersionKey } from "../lib/constants";
@@ -449,6 +451,7 @@ const MIN_CPU_THREADS = 1;
 const MIN_RAM_GB = 2;
 const MIN_DISK_GB = 32;
 
+const $router = useRouter();
 const license = ref("");
 const specs = ref<Specs>({
     cpuThreads: 0,
@@ -459,7 +462,7 @@ const specs = ref<Specs>({
     ipTablesLoaded: false,
     iptableNatLoaded: false
 })
-const currentStepIdx = ref(3);
+const currentStepIdx = ref(0);
 const currentStep = computed(() => steps[currentStepIdx.value]);
 const windowsVersion = ref<WindowsVersionKey>("11");
 const windowsLanguage = ref("English");

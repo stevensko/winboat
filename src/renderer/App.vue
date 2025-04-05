@@ -3,7 +3,7 @@
         <x-titlebar
             @minimize="handleMinimize()"
             @buttonclick="handleTitleBarEvent"
-        class="bg-grey-900">
+        class="bg-neutral-900">
             <x-label>WinBoat</x-label>
         </x-titlebar>
 
@@ -11,16 +11,16 @@
             <x-nav class="w-64 flex flex-col gap-0.5">
                 <div class="p-4 flex flex-row items-center gap-4">
                     <img class="rounded-full w-16"
-                        src="https://i.redd.it/windows-xp-user-icons-part-1-v0-soali9nw74qb1.jpg?width=1063&format=pjpg&auto=webp&s=e9002d903bd25dca2af09ebbcb87cb8f5460c607"
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png"
                         alt="Profile Picture">
                     <div>
-                        <x-label class="text-lg font-semibold">Kókánymester</x-label>
-                        <x-label class="text-[0.8rem]">Helyi Fiók</x-label>
+                        <x-label class="text-lg font-semibold">{{ os.userInfo().username }}</x-label>
+                        <x-label class="text-[0.8rem]">Local Account</x-label>
                     </div>
                 </div>
-                <RouterLink v-for="route of routes" :to="route.path" :key="route.path">
+                <RouterLink v-for="route of routes.filter(r => r.name != 'SetupUI')" :to="route.path" :key="route.path">
                     <x-navitem value="first">
-                        <Icon class="w-5 h-5 mr-4" :icon="route.meta!.icon"></Icon>
+                        <Icon class="w-5 h-5 mr-4" :icon="(route.meta!.icon as string)"></Icon>
                         <x-label>{{ route.name }}</x-label>
                     </x-navitem>
                 </RouterLink>
@@ -52,10 +52,21 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { routes } from './router';
 import { Icon } from '@iconify/vue';
 import { onMounted } from 'vue';
+import { isInstalled } from './lib/install';
 const { BrowserWindow }: typeof import('@electron/remote') = require('@electron/remote')
+const os: typeof import('os') = require('os')
+const path: typeof import('path') = require('path')
+const remote: typeof import('@electron/remote') = require('@electron/remote');
 
-onMounted(() => {
-    useRouter().push('/setup')
+const $router = useRouter();
+
+onMounted(async () => {
+    console.log("WinBoat app path:", path.join(remote.app.getAppPath(), "..", ".."));
+    const winboatInstalled = await isInstalled();
+    if (!winboatInstalled) {
+        console.log("Not installed, redirecting to setup...")
+        $router.push('/setup')
+    }
 })
 
 function handleMinimize() {

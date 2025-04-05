@@ -12,6 +12,21 @@ body {
     font-style: normal;
 }
 
+/* Xel reset, why do they modify default tags anyway...? */
+body img {
+    display: unset;
+    height: unset;
+    margin: unset;
+    max-width: unset;
+    box-sizing: unset;
+    background: unset;
+    border-width: unset;
+    border-style: unset;
+    border-color: unset;
+    user-select: unset;
+    -webkit-user-modify: unset;
+}
+
 .generic-hover {
     @apply hover:brightness-90 transition duration-200;
 }
