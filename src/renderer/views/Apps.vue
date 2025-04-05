@@ -20,7 +20,7 @@
                 <div v-if="apps.length" class="grid app-grid gap-4">
                     <x-card
                         v-for="app of computedApps" :key="app.Name"
-                        class="cursor-pointer generic-hover p-2 my-0 flex flex-row gap-2 items-center justify-between"
+                        class="cursor-pointer generic-hover p-2 my-0 flex flex-row gap-2 items-center justify-between bg-neutral-800/20 backdrop-brightness-150 backdrop-blur-xl"
                         @click="winboat.launchApp(app)"
                     >
                         <div class="flex flex-row items-center gap-2 w-[85%]">
@@ -30,7 +30,7 @@
                         <Icon icon="cuida:caret-right-outline"></Icon>
                     </x-card>
                 </div>
-                <div v-else class="flex justify-center items-center mt-20">
+                <div v-else class="flex justify-center items-center mt-40">
                     <x-throbber class="w-16 h-16"></x-throbber>
                 </div>
             </main>

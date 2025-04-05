@@ -366,7 +366,7 @@
                 </div>
             </Transition>
         </div>
-        <div class="absolute gradient-ball left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] -z-10"></div>
+        <div class="absolute gradient-bg left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] -z-10"></div>
     </div>
 </template>
 
@@ -511,7 +511,7 @@ function install() {
 </script>
 
 <style>
-.gradient-ball {
+.gradient-bg {
     width: 90vw;
     height: 80vh;
     border-radius: 10px;

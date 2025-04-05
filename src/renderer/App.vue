@@ -1,14 +1,18 @@
 <template>
-    <main class="h-screen w-screen">
-        <x-titlebar
-            @minimize="handleMinimize()"
-            @buttonclick="handleTitleBarEvent"
-        class="bg-neutral-900">
+    <main class="h-screen w-screen overflow-hidden relative">
+        <!-- Decoration -->
+        <div class="gradient-ball absolute -z-10 left-0 bottom-0 translate-x-[-50%] translate-y-[50%] w-[90vw] aspect-square opacity-15 blob-anim"></div>
+        <div class="gradient-ball absolute -z-10 right-0 top-0 translate-x-[50%] translate-y-[-50%] w-[90vw] aspect-square opacity-15 blob-anim"></div>
+
+        <!-- Titlebar -->
+        <x-titlebar @minimize="handleMinimize()" @buttonclick="handleTitleBarEvent" class="bg-neutral-900/50 backdrop-blur-xl">
             <x-label>WinBoat</x-label>
         </x-titlebar>
 
-        <div v-if="useRoute().name !== 'SetupUI'" class="flex flex-row">
-            <x-nav class="w-64 flex flex-col gap-0.5">
+
+        <!-- UI / SetupUI -->
+        <div v-if="useRoute().name !== 'SetupUI'" class="flex flex-row h-[calc(100vh-2rem)]">
+            <x-nav class="w-72 flex flex-col gap-0.5 bg-gray-500/10 backdrop-contrast-90 backdrop-blur-xl">
                 <div class="p-4 flex flex-row items-center gap-4">
                     <img class="rounded-full w-16"
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png"
@@ -25,7 +29,7 @@
                     </x-navitem>
                 </RouterLink>
             </x-nav>
-            <div class="px-5 flex-grow max-h-[calc(100vh-2.5rem)] overflow-y-auto pb-4">
+            <div class="px-5 flex-grow max-h-[calc(100vh-2rem)] overflow-y-auto pb-4">
                 <div class="flex flex-row items-center gap-2 my-6">
                     <Icon class="w-6 h-6 opacity-60" icon="icon-park-solid:toolkit"></Icon>
                     <h1 class="text-2xl font-semibold opacity-60">
@@ -76,7 +80,7 @@ function handleMinimize() {
 
 function handleTitleBarEvent(e: CustomEvent) {
     console.log("TitleBarEvt", e);
-    switch(e.detail) {
+    switch (e.detail) {
         case "close":
             BrowserWindow.getFocusedWindow()!.close();
             break;
@@ -93,3 +97,26 @@ function handleTitleBarEvent(e: CustomEvent) {
     }
 }
 </script>
+
+<style>
+.gradient-ball {
+    border-radius: 99999px;
+    background: linear-gradient(197.37deg, #7450DB -0.38%, rgba(138, 234, 240, 0) 101.89%), linear-gradient(115.93deg, #3E88F6 4.86%, rgba(62, 180, 246, 0.33) 38.05%, rgba(62, 235, 246, 0) 74.14%), radial-gradient(56.47% 76.87% at 6.92% 7.55%, rgba(62, 136, 246, 0.7) 0%, rgba(62, 158, 246, 0.182) 52.16%, rgba(62, 246, 246, 0) 100%), linear-gradient(306.53deg, #2EE4E3 19.83%, rgba(46, 228, 227, 0) 97.33%);
+    background-blend-mode: normal, normal, normal, normal, normal, normal;
+    filter: blur(200px);
+}
+
+@keyframes blob {
+    from {
+        filter: hue-rotate(0deg) blur(200px);
+    }
+    to {
+        filter: hue-rotate(45deg) blur(200px);
+    }
+}
+
+.blob-anim {
+    animation: blob 5s linear infinite;
+    animation-direction: alternate-reverse;
+}
+</style>
