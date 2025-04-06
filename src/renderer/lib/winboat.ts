@@ -113,7 +113,7 @@ export class Winboat {
         let cmd = `xfreerdp /u:"${username}"\
         /p:"${password}"\
         /v:127.0.0.1\
-        /cert:tofu\
+        /cert:ignore\
         +clipboard\
         -wallpaper\
         /sound:sys:pulse\
@@ -127,7 +127,7 @@ export class Winboat {
             cmd = `xfreerdp /u:"${username}"\
                 /p:"${password}"\
                 /v:127.0.0.1\
-                /cert:tofu\
+                /cert:ignore\
                 +clipboard\
                 +f\
                 /sound:sys:pulse\
