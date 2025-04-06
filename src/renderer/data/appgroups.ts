@@ -13,7 +13,7 @@ export type AppGroup = Category[];
 
 export const appGroups: AppGroup = [
     {
-        "category": "Böngészők",
+        "category": "Browsers",
         "apps": [
             { "name": "Mozilla Firefox", "package": "firefox", icon: "logos:firefox" },
             { "name": "Google Chrome", "package": "googlechrome", icon: "devicon:chrome" },
@@ -25,7 +25,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Üzenet & Kommunikáció",
+        "category": "Messaging & Communication",
         "apps": [
             { "name": "Discord", "package": "discord.install", icon: "skill-icons:discord" },
             { "name": "Slack", "package": "slack", icon: "devicon:slack" },
@@ -35,7 +35,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Biztonság",
+        "category": "Security",
         "apps": [
             { "name": "Bitwarden", "package": "bitwarden", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.icon-icons.com%2Ficons2%2F3053%2FPNG%2F512%2Fbitwarden_alt_macos_bigsur_icon_190338.png&f=1&nofb=1&ipt=255f72a190d220e8cb42fd6b132681b85a06394081910b49a929174574e4ee67&ipo=images" },
             { "name": "KeePassXC", "package": "keepassxc", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fkeepassxc-icon-512x512-kzzncwc1.png&f=1&nofb=1&ipt=f93c36d6720fffac9c208152d93748c38832f42c3653e70141f88be1b4deb22e&ipo=images" },
@@ -48,7 +48,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Média",
+        "category": "Media",
         "apps": [
             { "name": "Spotify", "package": "spotify", icon: "logos:spotify-icon" },
             { "name": "iTunes", "package": "itunes", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn2.iconfinder.com%2Fdata%2Ficons%2Fios7-inspired-mac-icon-set%2F1024%2Fitunes_5122x.png&f=1&nofb=1&ipt=e9629b7110ae831d4f472381851bca71f93665bf911785e6b980c02751a66c51&ipo=images" },
@@ -61,7 +61,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Eszközök",
+        "category": "Tools",
         "apps": [
             { "name": "PowerToys", "package": "powertoys", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmspoweruser.com%2Fwp-content%2Fuploads%2F2022%2F09%2FPowerToys-icon.png&f=1&nofb=1&ipt=a8a326f9db77da5f9a78826f11e3dc8cf14fecd1707b99178bec837a4f77255d&ipo=images" },
             { "name": "Everything", "package": "everything", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.lo4d.com%2Ft%2Ficon%2F128%2Feverything.png&f=1&nofb=1&ipt=ef4943188444ae270058e5a55306d4bd57372f12ac3e7ba1c12f7b09f74a02c8&ipo=images" },
@@ -78,7 +78,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Fájlmegosztás",
+        "category": "File Sharing",
         "apps": [
             { "name": "qBittorrent", "package": "qbittorrent", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fqbittorrent-icon-2048x2048-kbb7ayst.png&f=1&nofb=1&ipt=0a41c6c32045629a72de9979229ad658553f0c370312134be8315dc9bdb8fa5d&ipo=images" },
             { "name": "Transmission", "package": "transmission", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ficons.veryicon.com%2Fpng%2FApplication%2FMavrick%2FTransmission.png&f=1&nofb=1&ipt=5ae38f0bde1b50c5d2bc81a2c1113a9eba59f80865ba148dbdd7c10f097bd9be&ipo=images" },
@@ -86,7 +86,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Kreatív",
+        "category": "Creative",
         "apps": [
             { "name": "OBS Studio", "package": "obs-studio", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.logolynx.com%2Fimages%2Flogolynx%2F5c%2F5cc1b4995bc7aa4b5356ca3cf6968638.png&f=1&nofb=1&ipt=d4f9e914065740fd5339fca661e0bcaa72c87736d4184953c5f77db7466cd8cb&ipo=images" },
             { "name": "Audacity", "package": "audacity", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Faudacity-icon-462x512-n5heqj8v.png&f=1&nofb=1&ipt=3a5cb883a833e93e9f8ec68dc8df6b6c591f6e5d25004009603c7a0388e485bc&ipo=images" },
@@ -102,7 +102,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Csomagolás",
+        "category": "Archives",
         "apps": [
             { "name": "7-Zip", "package": "7zip", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ficon-library.com%2Fimages%2F7zip-icon%2F7zip-icon-3.jpg&f=1&nofb=1&ipt=09365c684c202619220b15d0eeb71b0573d27ffb65d3095adfb1e638ad546622&ipo=images" },
             { "name": "PeaZip", "package": "peazip.install", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages-wixmp-ed30a86b8c4ca887773594c2.wixmp.com%2Fi%2F94df4f8b-e4ce-4832-82bd-181b68cc65dc%2Fdda7cfe-86c36439-14bc-44c8-a015-7cd40b769ada.png&f=1&nofb=1&ipt=06034e700ab99258a053e27ff4457d83b42c9f6d647dab4f760469b118f7d51e&ipo=images" },
@@ -110,7 +110,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Felhő",
+        "category": "Cloud",
         "apps": [
             { "name": "Dropbox", "package": "dropbox", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.icon-icons.com%2Ficons2%2F1195%2FPNG%2F512%2F1490889640-dropbox_82530.png&f=1&nofb=1&ipt=b2f2bbf2c549b808cf736064c8cd738a22319a37ed9bba2eb08f86c0b2d18e56&ipo=images" },
             { "name": "Google Drive", "package": "googledrive", icon: "logos:google-drive" },
@@ -120,7 +120,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Dokumentumok",
+        "category": "Documents",
         "apps": [
             { "name": "Foxit PDF Reader", "package": "foxitreader", icon: "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.icons101.com%2Ficon_png%2Fsize_512%2Fid_82078%2FFoxit.png&f=1&nofb=1&ipt=ba2987de2118b0aa42f686361af98fabf483ad5c0115e8c8f67f13fd08f2e133&ipo=images" },
             { "name": "Sumatra PDF Reader", "package": "sumatrapdf", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ffreesoft.ru%2Fstorage%2Fimages%2F204%2F2032%2F203117%2F203117_normal.png&f=1&nofb=1&ipt=6df0de1b7708e054b89b0e7145909f5a2134d0722ad42b92756cb1e9b0cf7a02&ipo=images" },
@@ -130,7 +130,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Szerkesztés",
+        "category": "Editing",
         "apps": [
             { "name": "Notion", "package": "notion", icon: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.icon-icons.com%2Ficons2%2F2429%2FPNG%2F512%2Fnotion_logo_icon_147257.png&f=1&nofb=1&ipt=882a8458ba9b335aed265661fcc140fc48e2ac310735b40dfea3e91c937660b9&ipo=images" },
             { "name": "Obsidian", "package": "obsidian", icon: "skill-icons:obsidian-light" },
@@ -148,7 +148,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Programnyelvek és Runtime-ok",
+        "category": "Programming Languges & Runtimes",
         "apps": [
             { "name": "Python 3", "package": "python", icon: "devicon:python" },
             { "name": "Python 2", "package": "python2", icon: "devicon:python" },
@@ -168,7 +168,7 @@ export const appGroups: AppGroup = [
         ]
     },
     {
-        "category": "Fejlesztői Eszközök",
+        "category": "Developer Tools",
         "apps": [
             { "name": "PowerShell", "package": "powershell", icon: "skill-icons:powershell-dark" },
             { "name": "Visual Studio Code", "package": "vscode", icon: "devicon:vscode" },

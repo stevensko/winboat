@@ -11,7 +11,8 @@ export const routes: RouteRecordRaw[] = [
     { path: '/setup', name: "SetupUI", component: SetupUI, meta: { icon: 'fluent-mdl2:install-to-drive' } },
     // { path: '/adblock', name: "Reklámvédelem", component: Adblock, meta: { icon: 'fluent:shield-32-filled' } },
     { path: '/apps', name: "Apps", component: Apps, meta: { icon: 'fluent:apps-32-filled' } },
-    { path: '/install-center', name: "Install Center", component: InstallCenter, meta: { icon: 'clarity:store-solid' } },
+    // WIP
+    // { path: '/install-center', name: "Install Center", component: InstallCenter, meta: { icon: 'clarity:store-solid' } },
     { path: '/configuration', name: "Configuration", component: Home, meta: { icon: 'icon-park-outline:config' } },
     { path: '/about', name: "About", component: About, meta: { icon: 'fluent:info-32-filled' } },
 

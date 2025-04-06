@@ -1,6 +1,6 @@
 <template>
     <div>
-        <x-label class="text-neutral-300">Alkalmazások</x-label>
+        <x-label class="text-neutral-300">Apps</x-label>
         <div class="px-2">
             <x-accordion v-for="group of appGroups">
                 <header>
@@ -16,8 +16,6 @@
                             <img v-else class="size-10 rounded-md" :src="app.icon!"></img>
                             <div>
                                 <x-label>{{ app.name }}</x-label>
-                                <x-label class="mt-1 text-[0.65rem] text-neutral-400 hidden">uBlock Origin
-                                    segítségével</x-label>
                             </div>
                             <x-checkbox class="ml-auto" :toggled="isAppSelected(app)"></x-checkbox>
                         </x-card>
