@@ -32,15 +32,15 @@
                     <p class="text-xs text-neutral-500">WinBoat Pre-Release Alpha {{ appVer }}</p>
                 </div>
             </x-nav>
-            <div class="px-5 flex-grow max-h-[calc(100vh-2rem)] overflow-y-auto pb-4">
+            <div class="px-5 flex-grow max-h-[calc(100vh-2rem)] overflow-y-auto py-4">
                 <div class="flex flex-row items-center gap-2 my-6">
                     <Icon class="w-6 h-6 opacity-60" icon="icon-park-solid:toolkit"></Icon>
-                    <h1 class="text-2xl font-semibold opacity-60">
+                    <h1 class="text-2xl font-semibold opacity-60 my-0">
                         WinBoat
                     </h1>
                     <Icon class="w-6 h-6" icon="bitcoin-icons:caret-right-filled"></Icon>
                     <Icon class="w-6 h-6" :icon="(useRoute().meta.icon as string)"></Icon>
-                    <h1 class="text-2xl font-semibold">
+                    <h1 class="text-2xl font-semibold my-0">
                         {{ useRoute().name }}
                     </h1>
                 </div>

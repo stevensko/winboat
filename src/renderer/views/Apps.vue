@@ -6,7 +6,6 @@
                 id="select-username"
                 class="w-64 max-w-64"
                 type="text"
-                minlength="2"
                 maxlength="32"
                 :value="searchInput"
                 @input="(e: any) => searchInput = e.target.value"
