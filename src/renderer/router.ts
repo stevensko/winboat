@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import InstallCenter from './views/InstallCenter.vue'
 import SetupUI from './views/SetupUI.vue'
 import Apps from './views/Apps.vue'
+import About from './views/About.vue'
 
 export const routes: RouteRecordRaw[] = [
     { path: '/', name: "Home", component: Home, meta: { icon: 'fluent:home-32-filled' } },
@@ -12,7 +13,7 @@ export const routes: RouteRecordRaw[] = [
     { path: '/apps', name: "Apps", component: Apps, meta: { icon: 'fluent:apps-32-filled' } },
     { path: '/install-center', name: "Install Center", component: InstallCenter, meta: { icon: 'clarity:store-solid' } },
     { path: '/configuration', name: "Configuration", component: Home, meta: { icon: 'icon-park-outline:config' } },
-    { path: '/about', name: "About", component: Home, meta: { icon: 'fluent:info-32-filled' } },
+    { path: '/about', name: "About", component: About, meta: { icon: 'fluent:info-32-filled' } },
 
 ]
 

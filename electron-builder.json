@@ -8,7 +8,7 @@
         "oneClick": false,
         "perMachine": false,
         "allowToChangeInstallationDirectory": true,
-        "shortcutName": "OpenFox"
+        "shortcutName": "WinBoat"
     },
     "win": {
         "target": "nsis"

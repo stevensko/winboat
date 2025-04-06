@@ -7,8 +7,10 @@ initialize();
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
+        minWidth: 1280,
+        minHeight: 800,
         width: 1280,
-        height: 720,
+        height: 800,
         y: 0,
         x: 500,
         transparent: false,
