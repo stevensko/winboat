@@ -1,0 +1,4 @@
+export const InternalApps = {
+    WINDOWS_DESKTOP: "WINDOWS_DESKTOP",
+    WINDOWS_EXPLORER: "WINDOWS_EXPLORER"
+}
