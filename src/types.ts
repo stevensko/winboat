@@ -33,7 +33,7 @@ export type ComposeConfig = {
         [key: string]: null | string;
     };
     services: {
-        [serviceName: string]: {
+        windows: {
             image: string;
             container_name: string;
             environment: {
@@ -49,6 +49,7 @@ export type ComposeConfig = {
             };
             privileged: boolean;
             ports: string[];
+            cap_add: string[];
             stop_grace_period: string;
             restart: string;
             volumes: string[];

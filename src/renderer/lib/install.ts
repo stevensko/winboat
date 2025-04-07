@@ -33,6 +33,9 @@ const defaultCompose: ComposeConfig = {
                 "HOME": "${HOME}",
                 "LANGUAGE": "English",
             },
+            "cap_add": [
+                "NET_ADMIN"
+            ],
             "privileged": true,
             "ports": [
                 "8006:8006", // VNC Web Interface
