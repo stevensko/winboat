@@ -37,7 +37,7 @@ export type ComposeConfig = {
             image: string;
             container_name: string;
             environment: {
-                VERSION: string;
+                VERSION: WindowsVersionKey;
                 RAM_SIZE: string;
                 CPU_CORES: string;
                 DISK_SIZE: string;
@@ -56,3 +56,20 @@ export type ComposeConfig = {
         };
     };
 };
+
+export type Metrics = {
+    cpu: {
+        usage: number, // Percentage, from 0 to 100%
+        frequency: number, // Frequency in Mhz (e.g. 2700)
+    },
+    ram: {
+        used: number, // RAM Usage in MB (e.g. 500)
+        total: number // RAM Total in MB (e.g. 4096)
+        percentage: number // RAM Usage in percentage (e.g. 70%)
+    },
+    disk: {
+        used: number, // Disk Usage in MB (e.g. 29491)
+        total: number, // Disk Total in MB (e.g. 102400)
+        percentage: number // Disk Usage in percentage (e.g. 70%)
+    }
+}

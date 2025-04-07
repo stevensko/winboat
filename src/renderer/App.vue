@@ -12,7 +12,7 @@
 
         <!-- UI / SetupUI -->
         <div v-if="useRoute().name !== 'SetupUI'" class="flex flex-row h-[calc(100vh-2rem)]">
-            <x-nav class="w-72 flex flex-col gap-0.5 bg-gray-500/10 backdrop-contrast-90 backdrop-blur-xl">
+            <x-nav class="w-72 flex flex-none flex-col gap-0.5 bg-gray-500/10 backdrop-contrast-90 backdrop-blur-xl">
                 <div class="p-4 flex flex-row items-center gap-4">
                     <img class="rounded-full w-16"
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png"

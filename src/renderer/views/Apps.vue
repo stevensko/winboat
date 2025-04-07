@@ -14,33 +14,46 @@
                 <x-label>Search</x-label>
             </x-input>
         </div>
-        <div class="px-2">
-            <main>
-                <div v-if="apps.length" class="grid app-grid gap-4">
-                    <x-card
-                        v-for="app of computedApps" :key="app.Name"
-                        class="cursor-pointer generic-hover p-2 my-0 flex flex-row gap-2 items-center justify-between bg-neutral-800/20 backdrop-brightness-150 backdrop-blur-xl"
-                        @click="winboat.launchApp(app)"
-                    >
-                        <div class="flex flex-row items-center gap-2 w-[85%]">
-                            <img class="size-10 rounded-md" :src="`data:image/jpeg;charset=utf-8;base64,${app.Icon}`"></img>
-                            <x-label class="text-ellipsis truncate">{{ app.Name }}</x-label>
-                        </div>
-                        <Icon icon="cuida:caret-right-outline"></Icon>
-                    </x-card>
-                </div>
-                <div v-else class="flex justify-center items-center mt-40">
-                    <x-throbber class="w-16 h-16"></x-throbber>
-                </div>
-            </main>
+        <div v-if="winboat.isOnline.value" class="px-2">
+            <div v-if="apps.length" class="grid app-grid gap-4">
+                <x-card
+                    v-for="app of computedApps" :key="app.Name"
+                    class="cursor-pointer generic-hover p-2 my-0 flex flex-row gap-2 items-center justify-between bg-neutral-800/20 backdrop-brightness-150 backdrop-blur-xl"
+                    @click="winboat.launchApp(app)"
+                >
+                    <div class="flex flex-row items-center gap-2 w-[85%]">
+                        <img class="size-10 rounded-md" :src="`data:image/jpeg;charset=utf-8;base64,${app.Icon}`"></img>
+                        <x-label class="text-ellipsis truncate">{{ app.Name }}</x-label>
+                    </div>
+                    <Icon icon="cuida:caret-right-outline"></Icon>
+                </x-card>
+            </div>
+            <div v-else class="flex justify-center items-center mt-40">
+                <x-throbber class="w-16 h-16"></x-throbber>
+            </div>
+        </div>
+        <div v-else class="px-2 mt-32">
+            <div class="flex flex-col gap-4 items-center justify-center">
+                <Icon class="size-32 text-violet-400" icon="fluent-mdl2:plug-disconnected"></Icon>
+                <h1
+                    class="text-xl font-semibold w-[30vw] text-center leading-16"
+                >
+                    <span v-if="winboat.containerStatus.value === ContainerStatus.Exited || winboat.containerStatus.value === ContainerStatus.Dead">
+                        The WinBoat Container is not running, please start it to view your apps list.
+                    </span>
+                    <span v-else>
+                        The WinBoat Guest API is not running, please restart the container. If this problem persists, contact customer support.
+                    </span>
+                </h1>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { computed, onMounted, ref } from 'vue';
-import { Winboat } from '../lib/winboat';
+import { computed, onMounted, ref, watch } from 'vue';
+import { ContainerStatus, Winboat } from '../lib/winboat';
 import { type WinApp } from '../../types';
 
 const winboat = new Winboat();
@@ -55,7 +68,15 @@ const computedApps = computed(() => {
 })
 
 onMounted(async () => {
-    apps.value = await winboat.getApps();
+    if (winboat.isOnline.value) {
+        apps.value = await winboat.getApps();
+    }
+
+    watch(winboat.isOnline, async (newVal, _) => {
+        if (newVal) {
+            apps.value = await winboat.getApps();
+        }
+    })
 })
 </script>
 

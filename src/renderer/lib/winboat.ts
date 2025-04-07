@@ -1,6 +1,6 @@
 import { ref, type Ref } from "vue";
 import { WINBOAT_DIR, WINBOAT_GUEST_API } from "./constants";
-import { ComposeConfig, WinApp } from "../../types";
+import type { ComposeConfig, Metrics, WinApp } from "../../types";
 import { createLogger } from "../utils/log";
 import { AppIcons } from "../data/appicons";
 import YAML from 'yaml';
@@ -47,6 +47,24 @@ export class Winboat {
     isOnline: Ref<boolean> = ref(false);
     #containerInterval: NodeJS.Timeout | null = null;
     containerStatus: Ref<ContainerStatusValue> = ref(ContainerStatus.Exited)
+    containerActionLoading: Ref<boolean> = ref(false)
+    #metricsInverval: NodeJS.Timeout | null = null;
+    metrics: Ref<Metrics> = ref<Metrics>({
+        cpu: {
+            usage: 0,
+            frequency: 0
+        },
+        ram: {
+            used: 0,
+            total: 0,
+            percentage: 0
+        },
+        disk: {
+            used: 0,
+            total: 0,
+            percentage: 0
+        }
+    })
 
     constructor() {
         if (instance) return instance;
@@ -67,6 +85,11 @@ export class Winboat {
             }
         }, 1000);
 
+        this.#metricsInverval = setInterval(async () => {
+            if (!this.isOnline.value) return;
+            this.metrics.value = await this.getMetrics();
+        }, 1000);
+
         instance = this;
 
         return instance;
@@ -74,13 +97,17 @@ export class Winboat {
 
     async getHealth() {
         // If /health returns 200, then the guest is ready
-        const res = await nodeFetch(`${WINBOAT_GUEST_API}/health`);
-        return res.status === 200;
+        try {
+            const res = await nodeFetch(`${WINBOAT_GUEST_API}/health`);
+            return res.status === 200;
+        } catch(e) {
+            return false;
+        }
     }
 
     async getContainerStatus() {
         const { stdout: _containerStatus } = await execAsync(`docker inspect --format="{{.State.Status}}" WinBoat`);
-        return _containerStatus as ContainerStatusValue;
+        return _containerStatus.trim() as ContainerStatusValue;
     }
 
     async getApps() {
@@ -88,6 +115,12 @@ export class Winboat {
         const apps = await res.json() as WinApp[];
         apps.push(...presetApps);
         return apps;
+    }
+
+    async getMetrics() {
+        const res = await nodeFetch(`${WINBOAT_GUEST_API}/metrics`);
+        const metrics = await res.json() as Metrics;
+        return metrics;
     }
 
     parseCompose() {
@@ -102,6 +135,66 @@ export class Winboat {
             username: compose.services.windows.environment.USERNAME,
             password: compose.services.windows.environment.PASSWORD
         }
+    }
+
+    async startContainer() {
+        logger.info("Starting WinBoat container...");
+        this.containerActionLoading.value = true;
+        try {
+            const { stdout } = await execAsync("docker container start WinBoat");
+            logger.info(`Container response: ${stdout}`);
+        } catch(e) {
+            logger.error("There was an error performing the container action.");
+            logger.error(e);
+            throw e;
+        }
+        logger.info("Successfully started WinBoat container");
+        this.containerActionLoading.value = false;
+    }
+
+    async stopContainer() {
+        logger.info("Stopping WinBoat container...");
+        this.containerActionLoading.value = true;
+        try {
+            const { stdout } = await execAsync("docker container stop WinBoat");
+            logger.info(`Container response: ${stdout}`);
+        } catch(e) {
+            logger.error("There was an error performing the container action.");
+            logger.error(e);
+            throw e;
+        }
+        logger.info("Successfully stopped WinBoat container");
+        this.containerActionLoading.value = false;
+    }
+
+    async pauseContainer() {
+        logger.info("Pausing WinBoat container...");
+        this.containerActionLoading.value = true;
+        try {
+            const { stdout } = await execAsync("docker container pause WinBoat");
+            logger.info(`Container response: ${stdout}`);
+        } catch(e) {
+            logger.error("There was an error performing the container action.");
+            logger.error(e);
+            throw e;
+        }
+        logger.info("Successfully paused WinBoat container");
+        this.containerActionLoading.value = false;
+    }
+
+    async unpauseContainer() {
+        logger.info("Unpausing WinBoat container...");
+        this.containerActionLoading.value = true;
+        try {
+            const { stdout } = await execAsync("docker container unpause WinBoat");
+            logger.info(`Container response: ${stdout}`);
+        } catch(e) {
+            logger.error("There was an error performing the container action.");
+            logger.error(e);
+            throw e;
+        }
+        logger.info("Successfully unpaused WinBoat container");
+        this.containerActionLoading.value = false;
     }
 
     async launchApp(app: WinApp) {
@@ -136,6 +229,7 @@ export class Winboat {
                 /compression &`;
         }
 
+        // Multiple spaces become one
         cmd = cmd.replace(/\s+/g, " ");
 
         logger.info(`Launch command:\n${cmd}`);

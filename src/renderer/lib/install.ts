@@ -24,7 +24,7 @@ const defaultCompose: ComposeConfig = {
             "image": "ghcr.io/dockur/windows:latest",
             "container_name": "WinBoat",
             "environment": {
-                "VERSION": "tiny11",
+                "VERSION": "11",
                 "RAM_SIZE": "4G",
                 "CPU_CORES": "4",
                 "DISK_SIZE": "64G",

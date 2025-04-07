@@ -1,6 +1,6 @@
 {
     "name": "winboat",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "description": "Windows Apps on Linux",
     "main": "main/main.js",
     "scripts": {
@@ -37,6 +37,7 @@
         "@iconify/vue": "^4.3.0",
         "@vueuse/core": "^12.4.0",
         "@vueuse/motion": "^2.2.6",
+        "apexcharts": "^4.5.0",
         "json-to-pretty-yaml": "^1.2.2",
         "marked": "^15.0.6",
         "nanoevents": "^9.1.0",
@@ -45,6 +46,7 @@
         "turndown": "^7.2.0",
         "vue": "^3.5.13",
         "vue-router": "^4.5.0",
+        "vue3-apexcharts": "^1.8.0",
         "winston": "^3.17.0",
         "xel": "^0.33.7",
         "yaml": "^2.7.1"
