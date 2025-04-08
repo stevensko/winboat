@@ -4,6 +4,7 @@ import type { ComposeConfig, Metrics, WinApp } from "../../types";
 import { createLogger } from "../utils/log";
 import { AppIcons } from "../data/appicons";
 import YAML from 'yaml';
+import PrettyYAML from "json-to-pretty-yaml";
 import { InternalApps } from "../data/internalapps";
 const nodeFetch: typeof import('node-fetch').default = require('node-fetch');
 const path: typeof import('path') = require('path');
@@ -173,6 +174,9 @@ export class Winboat {
         try {
             const { stdout } = await execAsync("docker container pause WinBoat");
             logger.info(`Container response: ${stdout}`);
+            // TODO: The heartbeat check should set this, but it doesn't because normal fetch timeout doesn't exist
+            // Fix it once you change fetch to something else
+            this.isOnline.value = false;
         } catch(e) {
             logger.error("There was an error performing the container action.");
             logger.error(e);
@@ -195,6 +199,56 @@ export class Winboat {
         }
         logger.info("Successfully unpaused WinBoat container");
         this.containerActionLoading.value = false;
+    }
+
+    async replaceCompose(composeConfig: ComposeConfig) {
+        logger.info("Going to replace compose config");
+        this.containerActionLoading.value = true;
+
+        const composeFilePath = path.join(WINBOAT_DIR, 'docker-compose.yml');
+
+        // 0. Stop the current container if it's online
+        if (this.containerStatus.value === ContainerStatus.Running) {
+            await this.stopContainer();
+        }
+
+        // 1. Compose down the current container
+        await execAsync(`docker compose -f ${composeFilePath} down`);
+
+        // 2. Create a backup directory if it doesn't exist
+        const backupDir = path.join(WINBOAT_DIR, 'backup');
+        if (!fs.existsSync(backupDir)) {
+            fs.mkdirSync(backupDir);
+            logger.info(`Created compose backup dir: ${backupDir}`)
+        }
+
+        // 3. Move the current compose file to backup
+        const backupFile = `${Date.now()}-docker-compose.yml`;
+        fs.renameSync(composeFilePath, path.join(backupDir, backupFile));
+        logger.info(`Backed up current compose at: ${path.join(backupDir, backupFile)}`);
+
+        // 4. Write new compose file
+        const newComposeYAML = PrettyYAML.stringify(composeConfig).replaceAll("null", "");
+        fs.writeFileSync(composeFilePath, newComposeYAML, { encoding: 'utf8' });
+        logger.info(`Wrote new compose file to: ${composeFilePath}`);
+
+        // 5. Deploy the container with the new compose file
+        await execAsync(`docker compose -f ${composeFilePath} up -d`);
+        logger.info("Replace compose config completed, successfully deployed new container");
+
+        this.containerActionLoading.value = false;
+    }
+
+    async resetWinboat() {
+        console.info("Resetting Winboat...");
+        await this.stopContainer();
+        console.info("Stopped container")
+        await execAsync("docker volume rm winboat_data");
+        console.info("Removed volume");
+        logger.close();
+        fs.unlinkSync(WINBOAT_DIR);
+        console.info(`Removed ${WINBOAT_DIR}`);
+        console.info("So long and thanks for all the fish!");
     }
 
     async launchApp(app: WinApp) {

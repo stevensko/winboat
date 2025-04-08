@@ -1,6 +1,6 @@
 {
     "name": "winboat",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Windows Apps on Linux",
     "main": "main/main.js",
     "scripts": {
