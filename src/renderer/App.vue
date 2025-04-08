@@ -22,7 +22,7 @@
                         <x-label class="text-[0.8rem]">Local Account</x-label>
                     </div>
                 </div>
-                <RouterLink v-for="route of routes.filter(r => r.name != 'SetupUI')" :to="route.path" :key="route.path">
+                <RouterLink v-for="route of routes.filter(r => !['SetupUI', 'Blank'].includes(r.name))" :to="route.path" :key="route.path">
                     <x-navitem value="first">
                         <Icon class="w-5 h-5 mr-4" :icon="(route.meta!.icon as string)"></Icon>
                         <x-label>{{ route.name }}</x-label>
@@ -73,7 +73,9 @@ onMounted(async () => {
     const winboatInstalled = await isInstalled();
     if (!winboatInstalled) {
         console.log("Not installed, redirecting to setup...")
-        $router.push('/setup')
+        $router.push('/setup');
+    } else {
+        $router.push('/home');
     }
 })
 

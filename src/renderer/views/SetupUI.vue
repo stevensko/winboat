@@ -360,7 +360,7 @@
                             <x-label class="text-lg text-gray-400 text-center">
                                 Windows has been installed successfully!
                             </x-label>
-                            <x-button @click="$router.push('/')">Finish</x-button>
+                            <x-button @click="$router.push('/home')">Finish</x-button>
                          </div>
                     </div>
                 </div>
