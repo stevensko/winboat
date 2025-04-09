@@ -241,11 +241,23 @@ export class Winboat {
 
     async resetWinboat() {
         console.info("Resetting Winboat...");
+
+        // 1. Stop container
         await this.stopContainer();
-        console.info("Stopped container")
+        console.info("Stopped container");
+        
+        // 2. Remove the container
+        await execAsync("docker rm WinBoat")
+        console.info("Removed container")
+
+        // 3. Remove the container volume
         await execAsync("docker volume rm winboat_data");
         console.info("Removed volume");
+        
+        // 4. Close logger
         logger.close();
+
+        // 5. Remove WinBoat directory
         fs.unlinkSync(WINBOAT_DIR);
         console.info(`Removed ${WINBOAT_DIR}`);
         console.info("So long and thanks for all the fish!");
