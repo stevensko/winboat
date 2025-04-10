@@ -6,6 +6,7 @@ import { AppIcons } from "../data/appicons";
 import YAML from 'yaml';
 import PrettyYAML from "json-to-pretty-yaml";
 import { InternalApps } from "../data/internalapps";
+import { WinboatConfig } from "./config";
 const nodeFetch: typeof import('node-fetch').default = require('node-fetch');
 const path: typeof import('path') = require('path');
 const fs: typeof import('fs') = require('fs');
@@ -66,6 +67,7 @@ export class Winboat {
             percentage: 0
         }
     })
+    #wbConfig: WinboatConfig | null = null
 
     constructor() {
         if (instance) return instance;
@@ -90,6 +92,8 @@ export class Winboat {
             if (!this.isOnline.value) return;
             this.metrics.value = await this.getMetrics();
         }, 1000);
+
+        this.#wbConfig = new WinboatConfig();
 
         instance = this;
 
@@ -279,6 +283,7 @@ export class Winboat {
         /microphone:sys:pulse\
         /floatbar\
         /compression\
+        /scale:${this.#wbConfig?.config.scale ?? 100}\
         /wm-class:"${app.Name}"\
         /app:program:"${app.Path}",name:"${app.Name}" &`;
 
@@ -292,6 +297,7 @@ export class Winboat {
                 /sound:sys:pulse\
                 /microphone:sys:pulse\
                 /floatbar\
+                /scale:${this.#wbConfig?.config.scale ?? 100}\
                 /compression &`;
         }
 
