@@ -86,6 +86,13 @@ jobs:
           
           # Retrieve and copy the source tarball from /tmp into the SOURCES directory
           TARBALL_PATH="${{ steps.prep.outputs.TARBALL_PATH }}"
+
+          # CRITICAL CHECK: Ensure the tarball exists before copying
+          if [ ! -f "$TARBALL_PATH" ]; then
+            echo "::error::Source tarball was not created at $TARBALL_PATH in the previous step. Stopping build."
+            exit 1
+          fi
+
           echo "Copying tarball from $TARBALL_PATH to ~/rpmbuild/SOURCES/"
           cp "$TARBALL_PATH" ~/rpmbuild/SOURCES/
           
