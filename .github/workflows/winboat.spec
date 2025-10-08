@@ -1,5 +1,5 @@
 Name:           winboat
-Version:        VERSION
+Version:        __VERSION__
 Release:        1%{?dist}
 Summary:        A tool for managing or monitoring a specific device type (Placeholder)
 License:        MIT
