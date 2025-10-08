@@ -1,4 +1,4 @@
-name: Build Source RPM (for COPR/Manual Upload)
+name: Build Source RPM
 
 on:
   push:
@@ -32,8 +32,12 @@ jobs:
           # 3. Create the Source Tarball, including the new data/usb.ids file
           TARBALL_NAME="winboat-$VERSION.tar.gz"
           echo "Creating $TARBALL_NAME..."
+          # Fix: Exclude the created tarball itself ($TARBALL_NAME) to avoid the error.
           # Exclude common large/unnecessary files like .git and build modules/cache
-          tar -czvf $TARBALL_NAME --exclude=.git --exclude=node_modules .
+          tar -czvf $TARBALL_NAME \
+            --exclude=.git \
+            --exclude=node_modules \
+            --exclude=$TARBALL_NAME .
           
           # Pass the version to later steps
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
