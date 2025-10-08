@@ -136,13 +136,6 @@ jobs:
         with:
           name: winboat-srpm
           path: ~/rpmbuild/SRPMS/*.src.rpm
-
-      - name: Debug Check for COPR Token Secret
-        if: ${{ secrets.COPR_API_TOKEN == '' }}
-        run: |
-          echo "::error::COPR_API_TOKEN secret is NOT set or empty!"
-          echo "You MUST set this secret in your GitHub repository settings under Settings > Secrets > Actions."
-          exit 1
           
       - name: Submit SRPM to COPR
         uses: packit/upload-to-copr@v1 # A common, reliable action for COPR submission
