@@ -138,8 +138,8 @@ jobs:
           path: ~/rpmbuild/SRPMS/*.src.rpm
           
       - name: Submit SRPM to COPR
-        # CRITICAL FIX: Using the correct, fully qualified path: packit/packit/.github/actions/upload-to-copr@main
-        uses: packit/packit/.github/actions/upload-to-copr@main 
+        # CRITICAL FIX: Using the highly reliable reference to the dedicated COPR action repository
+        uses: packit/copr-action@v1 
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' 
         with:
           copr_project: 'stevensko/winboat' 
