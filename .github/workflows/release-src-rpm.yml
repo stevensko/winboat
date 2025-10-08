@@ -141,7 +141,7 @@ jobs:
         id: submit_copr
         run: |
           SRPM_PATH="${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }}"
-          COPR_PROJECT="stevensko/winboat"
+          COPR_PROJECT="stevensko/WinBoat"
           
           echo "Submitting SRPM to COPR project $COPR_PROJECT at $SRPM_PATH..."
 
