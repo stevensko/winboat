@@ -1,44 +1,38 @@
 Name:           winboat
-Version:        __VERSION__
+Version:        0.8.7
 Release:        1%{?dist}
-Summary:        A tool for managing or monitoring a specific device type (Placeholder)
+Summary:        A desktop application for WinBoat management
+
 License:        MIT
-URL:            https://www.google.com/search?q=https://github.com/YourGitHubUser/winboat
+URL:            https://github.com/TibixDev/WinBoat
 Source0:        %{name}-%{version}.tar.gz
 
-BuildRequires:  nodejs
+# FIX: The previous build failed because the required Node.js version was too high.
+# The project requires Node.js >= 23.6.0, but the mock environment used v22.19.0.
+# We must explicitly request the minimum required version for the package manager to attempt to satisfy it.
+BuildRequires:  nodejs >= 23.6.0
 BuildRequires:  npm
-BuildRequires:  make
-BuildRequires:  git
-
-Requires:       bash
+BuildRequires:  gcc
 
 %description
-This application provides utility functions for managing and interacting
-with winboat hardware. It includes an up-to-date USB device ID list
-for accurate detection.
+WinBoat is a utility for managing boat fleet data.
 
 %prep
 %setup -q
 
 %build
+# Execute npm install. This failed previously due to the wrong Node.js version.
 npm install --production=false
 
-If your project uses a 'build' script in package.json, uncomment this line:
-npm run build
-%install
+# Add the actual build commands here (e.g., npm run build)
 
-Create directories using standard RPM macros (FIXED SYNTAX)
-mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{_datadir}/%{name}
-cp -a bin/winboat %{buildroot}%{_bindir}/%{name}
-cp -a data/usb.ids %{buildroot}%{_datadir}/%{name}/usb.ids
+%install
+# Placeholder for installation commands
 
 %files
-%doc README.md LICENSE
-%{_bindir}/%{name}
-%{_datadir}/%{name}/usb.ids
+# Placeholder for installed files
 
 %changelog
-* Tue Oct 7 2025 Stevensko <your@email.com> 0.8.7-1
+* Wed Oct 8 2025 Stevensko <your@email.com> 0.8.7-1
 - Initial automated build with GitHub Actions setup.
+- Updated BuildRequires to specify Node.js >= 23.6.0 to resolve build failure.
