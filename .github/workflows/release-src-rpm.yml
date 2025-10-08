@@ -25,9 +25,20 @@ jobs:
           mkdir -p data
           echo "Removing old usb.ids file..."
           rm -f data/usb.ids || true
-          echo "Downloading latest usb.ids from linux-usb.org..."
-          curl -o data/usb.ids http://www.linux-usb.org/usb.ids
-          echo "USB IDs database updated successfully"
+          echo "Attempting to download latest usb.ids from linux-usb.org..."
+          
+          # Implement robust download with HTTPS preference and HTTP fallback
+          DOWNLOAD_URL_HTTPS="https://www.linux-usb.org/usb.ids"
+          DOWNLOAD_URL_HTTP="http://www.linux-usb.org/usb.ids"
+          
+          if curl -sS -f -o data/usb.ids "$DOWNLOAD_URL_HTTPS"; then
+              echo "USB IDs database updated successfully via HTTPS."
+          elif curl -sS -f -o data/usb.ids "$DOWNLOAD_URL_HTTP"; then
+              echo "USB IDs database updated successfully via HTTP fallback."
+          else
+              # If both fail, issue a warning and continue, as this is often transient.
+              echo "::warning::Could not download usb.ids from either source. Proceeding with existing or missing file."
+          fi
           
           # 3. Create the Source Tarball, including the new data/usb.ids file
           TARBALL_NAME="winboat-$VERSION.tar.gz"
@@ -57,7 +68,8 @@ jobs:
           mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           
           # FIX: Dynamically find the .spec file anywhere in the repository and copy it
-          SPEC_FILE=$(find . -maxdepth 3 -iname "*.spec" -print -quit)
+          # Search the entire repository structure.
+          SPEC_FILE=$(find . -iname "*.spec" -print -quit)
 
           if [ -z "$SPEC_FILE" ]; then
             echo "::error::winboat.spec not found. Please ensure a .spec file exists in your repository."
@@ -66,7 +78,7 @@ jobs:
           
           echo "Found spec file: $SPEC_FILE"
           # Copy the found spec file into the SPECS directory
-          cp $SPEC_FILE ~/rpmbuild/SPECS/
+          cp "$SPEC_FILE" ~/rpmbuild/SPECS/
           
           # Copy the source tarball from /tmp into the SOURCES directory
           cp ${{ steps.prep.outputs.TARBALL_PATH }} ~/rpmbuild/SOURCES/
@@ -75,7 +87,8 @@ jobs:
         run: |
           # The -bs flag tells rpmbuild to 'Build Source' package only.
           # We use the full path to the spec file now
-          rpmbuild -bs ~/rpmbuild/SPECS/$(basename $SPEC_FILE)
+          SPEC_FILENAME=$(basename "$SPEC_FILE")
+          rpmbuild -bs ~/rpmbuild/SPECS/"$SPEC_FILENAME"
 
       - name: Upload Source RPM Artifact
         uses: actions/upload-artifact@v4
