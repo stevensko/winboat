@@ -5,6 +5,12 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Add permissions block to allow the workflow to read the uploaded artifact
+# and use secrets for COPR authentication.
+permissions:
+  contents: read
+  id-token: write # Required for some newer COPR actions, safe to include.
+
 jobs:
   build_source_rpm:
     runs-on: ubuntu-latest
@@ -100,6 +106,7 @@ jobs:
           echo "SPEC_FILENAME=$SPEC_FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Generate Source RPM (.src.rpm)
+        id: generate_srpm
         run: |
           # Retrieve the necessary variables
           SPEC_FILENAME="${{ steps.create_env.outputs.SPEC_FILENAME }}"
@@ -119,9 +126,24 @@ jobs:
           # 3. Run the build
           # The -bs flag tells rpmbuild to 'Build Source' package only.
           rpmbuild -bs "$SPEC_PATH"
+          
+          # Find the generated SRPM file path for the next step
+          SRPM_FILE=$(find "$HOME/rpmbuild/SRPMS" -name "*.src.rpm" -print -quit)
+          echo "SRPM_FILE_PATH=$SRPM_FILE" >> "$GITHUB_OUTPUT"
+
 
       - name: Upload Source RPM Artifact
         uses: actions/upload-artifact@v4
         with:
           name: winboat-srpm
           path: ~/rpmbuild/SRPMS/*.src.rpm
+
+      - name: Submit SRPM to COPR
+        uses: packit/upload-to-copr@v1 # A common, reliable action for COPR submission
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' # Only run on push/manual trigger
+        with:
+          copr_project: 'your-copr-username/winboat' # <<<--- REPLACE THIS WITH YOUR ACTUAL PROJECT NAME
+          # Use the path output from the previous step
+          files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
+          token: ${{ secrets.COPR_API_TOKEN }} # <<<--- Uses the secret you must define in GitHub
+          preserve_project: true # Keeps the existing COPR project structure
