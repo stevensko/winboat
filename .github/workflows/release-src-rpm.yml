@@ -138,10 +138,11 @@ jobs:
           path: ~/rpmbuild/SRPMS/*.src.rpm
           
       - name: Submit SRPM to COPR
-        uses: packit/upload-to-copr@v1 # A common, reliable action for COPR submission
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' # Only run on push/manual trigger
+        # FIX: Changed 'packit/upload-to-copr@v1' to the correct path 'packit/actions/upload-to-copr@v1'
+        uses: packit/actions/upload-to-copr@v1 
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' 
         with:
           copr_project: 'stevensko/winboat' 
           files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
-          token: ${{ secrets.COPR_API_TOKEN }} # <<<--- Uses the secret you must define in GitHub
-          preserve_project: true # Keeps the existing COPR project structure
+          token: ${{ secrets.COPR_API_TOKEN }} 
+          preserve_project: true 
