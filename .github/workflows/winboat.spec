@@ -38,9 +38,3 @@ cp -a data/usb.ids %{buildroot}%{_datadir}/%{name}/usb.ids
 %doc README.md LICENSE
 %{_bindir}/%{name}
 %{_datadir}/%{name}/usb.ids
-
-%changelog
-
-Wed Oct 08 2025 Gemini AI gemini@google.com - 0.0.1-1
-
-Initial SRPM generation for GitHub Actions.
