@@ -142,7 +142,7 @@ jobs:
         uses: packit/upload-to-copr@v1 # A common, reliable action for COPR submission
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' # Only run on push/manual trigger
         with:
-          copr_project: '@stevensko/WinBoat' # <<<--- REPLACE THIS WITH YOUR ACTUAL PROJECT NAME
+          copr_project: 'stevensko/winboat' # <<<--- REPLACE THIS WITH YOUR ACTUAL PROJECT NAME
           # Use the path output from the previous step
           files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
           token: ${{ secrets.COPR_API_TOKEN }} # <<<--- Uses the secret you must define in GitHub
