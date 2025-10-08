@@ -28,7 +28,7 @@ If your project uses a 'build' script in package.json, uncomment this line:
 npm run build
 %install
 
-Corrected macros: %{_bindir} and %{_datadir}
+Create directories using standard RPM macros
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -a bin/winboat %{buildroot}%{_bindir}/%{name}
