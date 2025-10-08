@@ -8,7 +8,7 @@ on:
 # Add permissions block to allow the workflow to read the uploaded artifact
 # and use secrets for COPR authentication (even though upload is removed, keeping permissions is safe).
 permissions:
-  contents: read
+  contents: write # CRITICAL: Changed from 'read' to 'write' to allow release creation
   id-token: write
 
 jobs:
@@ -131,8 +131,16 @@ jobs:
           SRPM_FILE=$(find "$HOME/rpmbuild/SRPMS" -name "*.src.rpm" -print -quit)
           echo "SRPM_FILE_PATH=$SRPM_FILE" >> "$GITHUB_OUTPUT"
 
-      - name: Upload Source RPM Artifact
+      - name: Upload Source RPM Artifact (Workflow Artifact)
         uses: actions/upload-artifact@v4
         with:
           name: winboat-srpm
           path: ~/rpmbuild/SRPMS/*.src.rpm
+
+      - name: Create GitHub Release and Upload SRPM
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.prep.outputs.VERSION }}
+          name: WinBoat Source RPM v${{ steps.prep.outputs.VERSION }}
+          # Attach the explicitly found SRPM file path
+          files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }}
