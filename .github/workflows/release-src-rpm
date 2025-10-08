@@ -1,0 +1,67 @@
+name: Build Source RPM (for COPR/Manual Upload)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build_source_rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        # Ensures the winboat.spec file is present
+
+      - name: Set Version, Update USB IDs, and Create Source Tarball
+        id: prep
+        run: |
+          # 1. Extract version number (assuming it's in package.json)
+          # Note: If no package.json, you MUST manually set the version here.
+          VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.1")
+          
+          # 2. Update USB IDs database (CRITICAL STEP from release.yml)
+          # Ensure 'data' directory exists, then download the latest file
+          mkdir -p data
+          echo "Removing old usb.ids file..."
+          rm -f data/usb.ids || true
+          echo "Downloading latest usb.ids from linux-usb.org..."
+          curl -o data/usb.ids http://www.linux-usb.org/usb.ids
+          echo "USB IDs database updated successfully"
+          
+          # 3. Create the Source Tarball, including the new data/usb.ids file
+          TARBALL_NAME="winboat-$VERSION.tar.gz"
+          echo "Creating $TARBALL_NAME..."
+          # Exclude common large/unnecessary files like .git and build modules/cache
+          tar -czvf $TARBALL_NAME --exclude=.git --exclude=node_modules .
+          
+          # Pass the version to later steps
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install RPM Build Tools
+        run: |
+          sudo apt-get update
+          # rpm-build is the core utility needed to create SRPMs
+          sudo apt-get install -y rpm rpm-build
+
+      - name: Create RPM Build Environment
+        run: |
+          # Create the mandatory directory structure for rpmbuild
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          
+          # Copy the spec file into the SPECS directory
+          cp winboat.spec ~/rpmbuild/SPECS/
+          
+          # Copy the source tarball into the SOURCES directory
+          cp winboat-${{ steps.prep.outputs.VERSION }}.tar.gz ~/rpmbuild/SOURCES/
+
+      - name: Generate Source RPM (.src.rpm)
+        run: |
+          # The -bs flag tells rpmbuild to 'Build Source' package only.
+          rpmbuild -bs ~/rpmbuild/SPECS/winboat.spec
+
+      - name: Upload Source RPM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: winboat-srpm
+          path: ~/rpmbuild/SRPMS/*.src.rpm
