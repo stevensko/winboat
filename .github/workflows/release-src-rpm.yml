@@ -47,7 +47,6 @@ jobs:
         run: |
           # Ensure package lists are up-to-date
           sudo apt-get update
-          # FIX: On modern Ubuntu runners, 'rpm-build' is sometimes not found.
           # We install 'rpm' (which provides rpmbuild) and 'build-essential' for fundamental tools.
           sudo apt-get install -y rpm build-essential
           echo "Installed RPM tools and dependencies successfully."
@@ -57,8 +56,17 @@ jobs:
           # Create the mandatory directory structure for rpmbuild
           mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           
-          # Copy the spec file into the SPECS directory
-          cp winboat.spec ~/rpmbuild/SPECS/
+          # FIX: Dynamically find the .spec file anywhere in the repository and copy it
+          SPEC_FILE=$(find . -maxdepth 3 -iname "*.spec" -print -quit)
+
+          if [ -z "$SPEC_FILE" ]; then
+            echo "::error::winboat.spec not found. Please ensure a .spec file exists in your repository."
+            exit 1
+          fi
+          
+          echo "Found spec file: $SPEC_FILE"
+          # Copy the found spec file into the SPECS directory
+          cp $SPEC_FILE ~/rpmbuild/SPECS/
           
           # Copy the source tarball from /tmp into the SOURCES directory
           cp ${{ steps.prep.outputs.TARBALL_PATH }} ~/rpmbuild/SOURCES/
@@ -66,7 +74,8 @@ jobs:
       - name: Generate Source RPM (.src.rpm)
         run: |
           # The -bs flag tells rpmbuild to 'Build Source' package only.
-          rpmbuild -bs ~/rpmbuild/SPECS/winboat.spec
+          # We use the full path to the spec file now
+          rpmbuild -bs ~/rpmbuild/SPECS/$(basename $SPEC_FILE)
 
       - name: Upload Source RPM Artifact
         uses: actions/upload-artifact@v4
