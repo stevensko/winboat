@@ -1,114 +1,122 @@
 name: Build Source RPM (for COPR/Manual Upload)
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build_source_rpm:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        # Ensures the winboat.spec file is present
+  build_source_rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        # Ensures the winboat.spec file is present
 
-      - name: Set Version, Update USB IDs, and Create Source Tarball
-        id: prep
-        run: |
-          # 1. Extract version number (assuming it's in package.json)
-          # Note: If no package.json, you MUST manually set the version here.
-          VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.1")
-          
-          # 2. Update USB IDs database (CRITICAL STEP from release.yml)
-          # Ensure 'data' directory exists, then download the latest file
-          mkdir -p data
-          echo "Removing old usb.ids file..."
-          rm -f data/usb.ids || true
-          echo "Attempting to download latest usb.ids from linux-usb.org..."
-          
-          # Implement robust download with HTTPS preference and HTTP fallback
-          DOWNLOAD_URL_HTTPS="https://www.linux-usb.org/usb.ids"
-          DOWNLOAD_URL_HTTP="http://www.linux-usb.org/usb.ids"
-          
-          if curl -sS -f -o data/usb.ids "$DOWNLOAD_URL_HTTPS"; then
-              echo "USB IDs database updated successfully via HTTPS."
-          elif curl -sS -f -o data/usb.ids "$DOWNLOAD_URL_HTTP"; then
-              echo "USB IDs database updated successfully via HTTP fallback."
-          else
-              # If both fail, issue a warning and continue, as this is often transient.
-              echo "::warning::Could not download usb.ids from either source. Proceeding with existing or missing file."
-          fi
-          
-          # 3. Create the Source Tarball, including the new data/usb.ids file
-          TARBALL_NAME="winboat-$VERSION.tar.gz"
-          TARBALL_PATH="/tmp/$TARBALL_NAME" # Define a path outside the source tree
-          echo "Creating $TARBALL_NAME and writing to $TARBALL_PATH..."
-          # FIX: Write the tarball to /tmp to avoid the 'file changed as we read it' error.
-          # We archive the current directory (.), but write the output to /tmp.
-          tar -czvf $TARBALL_PATH \
-            --exclude=.git \
-            --exclude=node_modules .
-          
-          # Pass the tarball path and version to later steps
-          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "TARBALL_PATH=$TARBALL_PATH" >> "$GITHUB_OUTPUT"
+      - name: Set Version, Update USB IDs, and Create Source Tarball
+        id: prep
+        run: |
+          # 1. Extract version number (assuming it's in package.json)
+          # Note: If no package.json, you MUST manually set the version here.
+          VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.1")
+          
+          # 2. Update USB IDs database (CRITICAL STEP from release.yml)
+          # Ensure 'data' directory exists, then download the latest file
+          mkdir -p data
+          echo "Removing old usb.ids file..."
+          rm -f data/usb.ids || true
+          echo "Attempting to download latest usb.ids from linux-usb.org..."
+          
+          # Implement robust download with HTTPS preference and HTTP fallback
+          DOWNLOAD_URL_HTTPS="https://www.linux-usb.org/usb.ids"
+          DOWNLOAD_URL_HTTP="http://www.linux-usb.org/usb.ids"
+          
+          if curl -sS -f -o data/usb.ids "$DOWNLOAD_URL_HTTPS"; then
+              echo "USB IDs database updated successfully via HTTPS."
+          elif curl -sS -f -o data/usb.ids "$DOWNLOAD_URL_HTTP"; then
+              echo "USB IDs database updated successfully via HTTP fallback."
+          else
+              # If both fail, issue a warning and continue, as this is often transient.
+              echo "::warning::Could not download usb.ids from either source. Proceeding with existing or missing file."
+          fi
+          
+          # 3. Create the Source Tarball, including the new data/usb.ids file
+          TARBALL_NAME="winboat-$VERSION.tar.gz"
+          TARBALL_PATH="/tmp/$TARBALL_NAME" # Define a path outside the source tree
+          echo "Creating $TARBALL_NAME and writing to $TARBALL_PATH..."
+          # FIX: Write the tarball to /tmp to avoid the 'file changed as we read it' error.
+          # We archive the current directory (.), but write the output to /tmp.
+          tar -czvf "$TARBALL_PATH" \
+            --exclude=.git \
+            --exclude=node_modules .
+          
+          # Pass the tarball path and version to later steps
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "TARBALL_PATH=$TARBALL_PATH" >> "$GITHUB_OUTPUT"
 
-      - name: Install RPM Build Tools
-        run: |
-          # Ensure package lists are up-to-date
-          sudo apt-get update
-          # We install 'rpm' (which provides rpmbuild) and 'build-essential' for fundamental tools.
-          sudo apt-get install -y rpm build-essential
-          echo "Installed RPM tools and dependencies successfully."
+      - name: Install RPM Build Tools
+        run: |
+          # Ensure package lists are up-to-date
+          sudo apt-get update
+          # We install 'rpm' (which provides rpmbuild) and 'build-essential' for fundamental tools.
+          sudo apt-get install -y rpm build-essential
+          echo "Installed RPM tools and dependencies successfully."
 
-      - name: Create RPM Build Environment
-        id: create_env
-        run: |
-          # Create the mandatory directory structure for rpmbuild
-          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-          
-          # FIX: Dynamically find the .spec file anywhere in the repository and copy it
-          SPEC_FILE=$(find . -iname "*.spec" -print -quit)
+      - name: Create RPM Build Environment
+        id: create_env
+        run: |
+          # Create the mandatory directory structure for rpmbuild
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          
+          # FIX: Dynamically find the .spec file anywhere in the repository and copy it
+          SPEC_FILE=$(find . -iname "*.spec" -print -quit)
 
-          if [ -z "$SPEC_FILE" ]; then
-            echo "::error::winboat.spec not found. Please ensure a .spec file exists in your repository."
-            exit 1
-          fi
-          
-          echo "Found spec file: $SPEC_FILE"
-          
-          # Get the filename (basename) of the spec file
-          SPEC_FILENAME=$(basename "$SPEC_FILE")
-          
-          # Copy the found spec file into the SPECS directory
-          cp "$SPEC_FILE" ~/rpmbuild/SPECS/
-          
-          # Retrieve and copy the source tarball from /tmp into the SOURCES directory
-          TARBALL_PATH="${{ steps.prep.outputs.TARBALL_PATH }}"
+          if [ -z "$SPEC_FILE" ]; then
+            echo "::error::winboat.spec not found. Please ensure a .spec file exists in your repository."
+            exit 1
+          fi
+          
+          echo "Found spec file: $SPEC_FILE"
+          
+          # Get the filename (basename) of the spec file
+          SPEC_FILENAME=$(basename "$SPEC_FILE")
+          
+          # Copy the found spec file into the SPECS directory
+          cp "$SPEC_FILE" ~/rpmbuild/SPECS/
+          
+          # Retrieve and copy the source tarball from /tmp into the SOURCES directory
+          TARBALL_PATH="${{ steps.prep.outputs.TARBALL_PATH }}"
 
-          # CRITICAL CHECK: Ensure the tarball exists before copying
-          if [ ! -f "$TARBALL_PATH" ]; then
-            echo "::error::Source tarball was not created at $TARBALL_PATH in the previous step. Stopping build."
-            exit 1
-          fi
+          # CRITICAL CHECK: Ensure the tarball exists before copying
+          if [ ! -f "$TARBALL_PATH" ]; then
+            echo "::error::Source tarball was not created at $TARBALL_PATH in the previous step. Stopping build."
+            exit 1
+          fi
 
-          echo "Copying tarball from $TARBALL_PATH to ~/rpmbuild/SOURCES/"
-          cp "$TARBALL_PATH" ~/rpmbuild/SOURCES/
-          
-          # Pass the SPEC_FILENAME to the next step via GITHUB_OUTPUT
-          echo "SPEC_FILENAME=$SPEC_FILENAME" >> "$GITHUB_OUTPUT"
+          echo "Copying tarball from $TARBALL_PATH to ~/rpmbuild/SOURCES/"
+          cp "$TARBALL_PATH" ~/rpmbuild/SOURCES/
+          
+          # Pass the SPEC_FILENAME to the next step via GITHUB_OUTPUT
+          echo "SPEC_FILENAME=$SPEC_FILENAME" >> "$GITHUB_OUTPUT"
 
-      - name: Generate Source RPM (.src.rpm)
-        run: |
-          # Retrieve the spec filename from the previous step's output
-          SPEC_FILENAME="${{ steps.create_env.outputs.SPEC_FILENAME }}"
-          
-          # The -bs flag tells rpmbuild to 'Build Source' package only.
-          rpmbuild -bs ~/rpmbuild/SPECS/"$SPEC_FILENAME"
+      - name: Generate Source RPM (.src.rpm)
+        run: |
+          # Retrieve the necessary variables
+          SPEC_FILENAME="${{ steps.create_env.outputs.SPEC_FILENAME }}"
+          VERSION="${{ steps.prep.outputs.VERSION }}"
+          SPEC_PATH="$HOME/rpmbuild/SPECS/$SPEC_FILENAME" # Use $HOME for consistency
+          
+          # 1. Inject the dynamic version number into the spec file
+          # The sed command replaces the placeholder with the actual version.
+          echo "Setting version $VERSION in $SPEC_PATH"
+          sed -i "s/__VERSION__/$VERSION/g" "$SPEC_PATH"
 
-      - name: Upload Source RPM Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: winboat-srpm
-          path: ~/rpmbuild/SRPMS/*.src.rpm
+          # 2. Run the build
+          # The -bs flag tells rpmbuild to 'Build Source' package only.
+          rpmbuild -bs "$SPEC_PATH"
+
+      - name: Upload Source RPM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: winboat-srpm
+          path: ~/rpmbuild/SRPMS/*.src.rpm
