@@ -142,7 +142,7 @@ jobs:
         uses: packit/copr-action@v1 
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' 
         with:
-          copr_project: '@stevensko/winboat' 
+          copr_project: '@stevensko/WinBoat' 
           files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
           token: ${{ secrets.COPR_API_TOKEN }} 
           preserve_project: true 
