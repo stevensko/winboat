@@ -1,4 +1,4 @@
-name: Build Source RPM (for COPR/Manual Upload)
+name: Build SRC RPM
 
 on:
   push:
