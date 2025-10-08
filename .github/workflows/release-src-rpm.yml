@@ -131,7 +131,6 @@ jobs:
           SRPM_FILE=$(find "$HOME/rpmbuild/SRPMS" -name "*.src.rpm" -print -quit)
           echo "SRPM_FILE_PATH=$SRPM_FILE" >> "$GITHUB_OUTPUT"
 
-
       - name: Upload Source RPM Artifact
         uses: actions/upload-artifact@v4
         with:
