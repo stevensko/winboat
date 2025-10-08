@@ -49,12 +49,15 @@ jobs:
           # 3. Create the Source Tarball, including the new data/usb.ids file
           TARBALL_NAME="winboat-$VERSION.tar.gz"
           TARBALL_PATH="/tmp/$TARBALL_NAME" # Define a path outside the source tree
-          echo "Creating $TARBALL_NAME and writing to $TARBALL_PATH..."
-          # FIX: Write the tarball to /tmp to avoid the 'file changed as we read it' error.
-          # We archive the current directory (.), but write the output to /tmp.
+          
+          echo "Creating $TARBALL_NAME with required top-level directory winboat-$VERSION..."
+          
+          # CRITICAL FIX: Use --transform to prepend the required directory name (winboat-$VERSION/) 
+          # to every file path inside the tarball, solving the "cd: No such file or directory" error.
           tar -czvf "$TARBALL_PATH" \
             --exclude=.git \
-            --exclude=node_modules .
+            --exclude=node_modules \
+            --transform "s|^|winboat-$VERSION/|" .
           
           # Pass the tarball path and version to later steps
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
@@ -75,7 +78,7 @@ jobs:
           mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           
           # FIX: Dynamically find the .spec file anywhere in the repository and copy it
-          SPEC_FILE=$(find . -iname "*.spec" -print -quit)
+          SPEC_FILE=$(find . -maxdepth 1 -iname "*.spec" -print -quit) # Limit depth to 1 for safety
 
           if [ -z "$SPEC_FILE" ]; then
             echo "::error::winboat.spec not found. Please ensure a .spec file exists in your repository."
@@ -125,6 +128,7 @@ jobs:
 
           # 3. Run the build
           # The -bs flag tells rpmbuild to 'Build Source' package only.
+          # Use the absolute path explicitly.
           rpmbuild -bs "$SPEC_PATH"
           
           # Find the generated SRPM file path for the next step
