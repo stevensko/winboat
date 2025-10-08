@@ -31,16 +31,17 @@ jobs:
           
           # 3. Create the Source Tarball, including the new data/usb.ids file
           TARBALL_NAME="winboat-$VERSION.tar.gz"
-          echo "Creating $TARBALL_NAME..."
-          # Fix: Exclude the created tarball itself ($TARBALL_NAME) to avoid the error.
-          # Exclude common large/unnecessary files like .git and build modules/cache
-          tar -czvf $TARBALL_NAME \
+          TARBALL_PATH="/tmp/$TARBALL_NAME" # Define a path outside the source tree
+          echo "Creating $TARBALL_NAME and writing to $TARBALL_PATH..."
+          # FIX: Write the tarball to /tmp to avoid the 'file changed as we read it' error.
+          # We archive the current directory (.), but write the output to /tmp.
+          tar -czvf $TARBALL_PATH \
             --exclude=.git \
-            --exclude=node_modules \
-            --exclude=$TARBALL_NAME .
+            --exclude=node_modules .
           
-          # Pass the version to later steps
+          # Pass the tarball path and version to later steps
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "TARBALL_PATH=$TARBALL_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Install RPM Build Tools
         run: |
@@ -56,8 +57,8 @@ jobs:
           # Copy the spec file into the SPECS directory
           cp winboat.spec ~/rpmbuild/SPECS/
           
-          # Copy the source tarball into the SOURCES directory
-          cp winboat-${{ steps.prep.outputs.VERSION }}.tar.gz ~/rpmbuild/SOURCES/
+          # Copy the source tarball from /tmp into the SOURCES directory
+          cp ${{ steps.prep.outputs.TARBALL_PATH }} ~/rpmbuild/SOURCES/
 
       - name: Generate Source RPM (.src.rpm)
         run: |
