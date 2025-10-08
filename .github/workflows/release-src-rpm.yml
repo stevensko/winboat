@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 # Add permissions block to allow the workflow to read the uploaded artifact
-# and use secrets for COPR authentication.
+# and use secrets for COPR authentication (even though upload is removed, keeping permissions is safe).
 permissions:
   contents: read
-  id-token: write # Required for some newer COPR actions, safe to include.
+  id-token: write
 
 jobs:
   build_source_rpm:
@@ -136,41 +136,3 @@ jobs:
         with:
           name: winboat-srpm
           path: ~/rpmbuild/SRPMS/*.src.rpm
-          
-      - name: Submit SRPM to COPR via cURL (Bypassing Action Dependency)
-        id: submit_copr
-        run: |
-          SRPM_PATH="${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }}"
-          COPR_PROJECT="stevensko/WinBoat" # Use the assumed working name
-          API_ENDPOINT="https://copr.fedorainfracloud.org/api_3/builds/upload/"
-          
-          echo "Submitting SRPM to COPR project $COPR_PROJECT at $SRPM_PATH..."
-          
-          # Use curl to submit the SRPM directly to the COPR API.
-          # -w "\nHTTP_CODE: %{http_code}\n": Prints the HTTP status code at the end.
-          RESPONSE=$(curl -sS -w "\nHTTP_CODE: %{http_code}\n" -X POST \
-            -F "pkgs=@$SRPM_PATH" \
-            -F "project=$COPR_PROJECT" \
-            -H "Authorization: token ${{ secrets.COPR_API_TOKEN }}" \
-            "$API_ENDPOINT")
-            
-          # Print the COPR API response for debugging
-          echo "COPR API Response:"
-          echo "$RESPONSE"
-          
-          # Check the HTTP status code (last 3 digits of the response line)
-          # We use grep -oE to reliably extract the 3-digit code
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1 | grep -oE '[0-9]{3}')
-
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-              echo "::notice::COPR submission complete (HTTP $HTTP_CODE). Check the COPR project page for build status."
-          elif [ "$HTTP_CODE" -eq 403 ] || [ "$HTTP_CODE" -eq 401 ]; then
-              echo "::error::COPR Submission Failed (HTTP $HTTP_CODE - Forbidden/Unauthorized). Your COPR_API_TOKEN is incorrect, expired, or lacks 'Write' permissions for the project '$COPR_PROJECT'."
-              exit 1
-          elif [ "$HTTP_CODE" -eq 404 ]; then
-              echo "::error::COPR Submission Failed (HTTP $HTTP_CODE - Not Found). The project '$COPR_PROJECT' may not exist or the name is incorrect. (COPR often returns 404 for permission/token issues too)."
-              exit 1
-          else
-              echo "::error::COPR Submission Failed (HTTP $HTTP_CODE). See API Response above for details. If the code is 000, the token or URL is likely invalid."
-              exit 1
-          fi
