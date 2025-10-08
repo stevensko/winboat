@@ -1,11 +1,7 @@
-#--------------------------------------------------------------------------------------
-
 WINBOAT RPM SPECIFICATION FILE
 This file defines how the 'winboat' source code is packaged into an RPM.
 NOTE: The GitHub Action pipeline automatically creates the source tarball
 named 'winboat-%{version}.tar.gz' for use by this spec file.
-#--------------------------------------------------------------------------------------
-
 --- Metadata ---
 Name:           winboat
 Version:        0.0.1
@@ -13,7 +9,7 @@ Release:        1%{?dist}
 Summary:        A tool for managing or monitoring a specific device type (Placeholder)
 
 License:        MIT  # Assuming MIT; change as needed
-URL:            https://www.google.com/search?q=https://github.com/YourGitHubUser/winboat # Corrected URL format
+URL:            https://www.google.com/search?q=https://github.com/YourGitHubUser/winboat # Use standard project URL
 Source0:        %{name}-%{version}.tar.gz
 
 --- Build Dependencies ---
