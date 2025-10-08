@@ -13,7 +13,7 @@ Release:        1%{?dist}
 Summary:        A tool for managing or monitoring a specific device type (Placeholder)
 
 License:        MIT  # Assuming MIT; change as needed
-URL:            https://www.google.com/search?q=https://github.com/YourGitHubUser/winboat
+URL:            https://www.google.com/search?q=https://github.com/YourGitHubUser/winboat # Corrected URL format
 Source0:        %{name}-%{version}.tar.gz
 
 --- Build Dependencies ---
