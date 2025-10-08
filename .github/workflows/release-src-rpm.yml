@@ -1,4 +1,4 @@
-name: Build SRC RPM
+name: Build Source RPM (for COPR/Manual Upload)
 
 on:
   push:
@@ -120,7 +120,7 @@ jobs:
 
           # 2. CRITICAL FIX: Ensure Source0 uses the correct RPM macro %{version} 
           # This overrides any lingering placeholders or literal strings in the Source0 tag.
-          echo "Fixing Source0 tag to use %{version} macro."
+          echo "Fixing Source0 tag to use %{name}-%{version}.tar.gz."
           sed -i "s/^Source0:.*/Source0:        %{name}-%{version}.tar.gz/" "$SPEC_PATH"
 
           # 3. Run the build
@@ -138,12 +138,21 @@ jobs:
           name: winboat-srpm
           path: ~/rpmbuild/SRPMS/*.src.rpm
 
+      - name: Debug: Check for COPR Token Secret
+        run: |
+          if [ -z "${{ secrets.COPR_API_TOKEN }}" ]; then
+            echo "::error::COPR_API_TOKEN secret is NOT set or empty!"
+            echo "You MUST set this secret in your GitHub repository settings under Settings > Secrets > Actions."
+            exit 1
+          else
+            echo "COPR_API_TOKEN secret is successfully loaded (non-empty)."
+          fi
+
       - name: Submit SRPM to COPR
         uses: packit/upload-to-copr@v1 # A common, reliable action for COPR submission
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' # Only run on push/manual trigger
         with:
-          copr_project: 'stevensko/winboat' # <<<--- REPLACE THIS WITH YOUR ACTUAL PROJECT NAME
-          # Use the path output from the previous step
+          copr_project: 'stevensko/winboat' 
           files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
           token: ${{ secrets.COPR_API_TOKEN }} # <<<--- Uses the secret you must define in GitHub
           preserve_project: true # Keeps the existing COPR project structure
