@@ -107,11 +107,16 @@ jobs:
           SPEC_PATH="$HOME/rpmbuild/SPECS/$SPEC_FILENAME" # Use $HOME for consistency
           
           # 1. Inject the dynamic version number into the spec file
-          # The sed command replaces the placeholder with the actual version.
+          # This replaces the __VERSION__ placeholder in the Version and Changelog fields.
           echo "Setting version $VERSION in $SPEC_PATH"
           sed -i "s/__VERSION__/$VERSION/g" "$SPEC_PATH"
 
-          # 2. Run the build
+          # 2. CRITICAL FIX: Ensure Source0 uses the correct RPM macro %{version} 
+          # This overrides any lingering placeholders or literal strings in the Source0 tag.
+          echo "Fixing Source0 tag to use %{version} macro."
+          sed -i "s/^Source0:.*/Source0:        %{name}-%{version}.tar.gz/" "$SPEC_PATH"
+
+          # 3. Run the build
           # The -bs flag tells rpmbuild to 'Build Source' package only.
           rpmbuild -bs "$SPEC_PATH"
 
