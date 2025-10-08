@@ -63,6 +63,7 @@ jobs:
           echo "Installed RPM tools and dependencies successfully."
 
       - name: Create RPM Build Environment
+        id: create_env # Added ID to pass output
         run: |
           # Create the mandatory directory structure for rpmbuild
           mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
@@ -77,17 +78,26 @@ jobs:
           fi
           
           echo "Found spec file: $SPEC_FILE"
+          
+          # Get the filename (basename) of the spec file
+          SPEC_FILENAME=$(basename "$SPEC_FILE")
+          
           # Copy the found spec file into the SPECS directory
           cp "$SPEC_FILE" ~/rpmbuild/SPECS/
           
           # Copy the source tarball from /tmp into the SOURCES directory
           cp ${{ steps.prep.outputs.TARBALL_PATH }} ~/rpmbuild/SOURCES/
+          
+          # Pass the SPEC_FILENAME to the next step via GITHUB_OUTPUT
+          echo "SPEC_FILENAME=$SPEC_FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Generate Source RPM (.src.rpm)
         run: |
+          # Retrieve the spec filename from the previous step's output
+          SPEC_FILENAME="${{ steps.create_env.outputs.SPEC_FILENAME }}"
+          
           # The -bs flag tells rpmbuild to 'Build Source' package only.
-          # We use the full path to the spec file now
-          SPEC_FILENAME=$(basename "$SPEC_FILE")
+          # Now that SPEC_FILENAME is correctly set, this command should execute successfully.
           rpmbuild -bs ~/rpmbuild/SPECS/"$SPEC_FILENAME"
 
       - name: Upload Source RPM Artifact
