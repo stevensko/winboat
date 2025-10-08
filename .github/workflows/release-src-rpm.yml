@@ -1,4 +1,4 @@
-name: Build Source RPM
+name: Build Source RPM (for COPR/Manual Upload)
 
 on:
   push:
@@ -46,8 +46,11 @@ jobs:
       - name: Install RPM Build Tools
         run: |
           sudo apt-get update
-          # rpm-build is the core utility needed to create SRPMs
-          sudo apt-get install -y rpm rpm-build
+          # FIX: Installing build-essential and the required RPM utilities
+          # build-essential provides fundamental tools like gcc and make
+          # rpm and rpm-build are the core RPM utilities
+          sudo apt-get install -y build-essential rpm rpm-build
+          echo "Installed rpm-build and dependencies successfully."
 
       - name: Create RPM Build Environment
         run: |
