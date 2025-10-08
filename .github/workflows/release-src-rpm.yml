@@ -137,12 +137,21 @@ jobs:
           name: winboat-srpm
           path: ~/rpmbuild/SRPMS/*.src.rpm
           
-      - name: Submit SRPM to COPR
-        # Final attempt to fix the action repository reference by using the main branch of the known action repo
-        uses: packit/upload-to-copr@main 
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' 
-        with:
-          copr_project: 'stevensko/winboat' 
-          files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
-          token: ${{ secrets.COPR_API_TOKEN }} 
-          preserve_project: true 
+      - name: Submit SRPM to COPR via cURL (Bypassing Action Dependency)
+        id: submit_copr
+        run: |
+          SRPM_PATH="${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }}"
+          COPR_PROJECT="stevensko/winboat"
+          
+          echo "Submitting SRPM to COPR project $COPR_PROJECT at $SRPM_PATH..."
+
+          # Use curl to submit the SRPM directly to the COPR API.
+          # -F: Sets up multipart form data for file and project name.
+          # -H: Sets the Authorization header using the secret token.
+          curl -sS -X POST \
+            -F "pkgs=@$SRPM_PATH" \
+            -F "project=$COPR_PROJECT" \
+            -H "Authorization: token ${{ secrets.COPR_API_TOKEN }}" \
+            "https://copr.fedorainfracloud.org/api_3/builds/upload/"
+            
+          echo "COPR submission complete. Check the COPR project page for build status."
