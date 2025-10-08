@@ -40,5 +40,5 @@ cp -a data/usb.ids %{buildroot}%{_datadir}/%{name}/usb.ids
 %{_datadir}/%{name}/usb.ids
 
 %changelog
-* Tue Oct 8 2025 Stevensko <your@email.com> 0.8.7-1
+* Tue Oct 7 2025 Stevensko <your@email.com> 0.8.7-1
 - Initial automated build with GitHub Actions setup.
