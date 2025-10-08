@@ -138,8 +138,8 @@ jobs:
           path: ~/rpmbuild/SRPMS/*.src.rpm
           
       - name: Submit SRPM to COPR
-        # FIX: Changed 'packit/upload-to-copr@v1' to the correct path 'packit/actions/upload-to-copr@v1'
-        uses: packit/actions/upload-to-copr@v1 
+        # FIX: Changed version tag from 'v1' to 'main' for increased stability in monorepo actions.
+        uses: packit/actions/upload-to-copr@main 
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' 
         with:
           copr_project: 'stevensko/winboat' 
