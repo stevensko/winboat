@@ -138,8 +138,10 @@ jobs:
           path: ~/rpmbuild/SRPMS/*.src.rpm
 
       - name: Debug: Check for COPR Token Secret
+        env:
+          COPR_TOKEN_CHECK: ${{ secrets.COPR_API_TOKEN }} # Pass secret to env for safer checking
         run: |
-          if [ -z "${{ secrets.COPR_API_TOKEN }}" ]; then
+          if [ -z "$COPR_TOKEN_CHECK" ]; then
             echo "::error::COPR_API_TOKEN secret is NOT set or empty!"
             echo "You MUST set this secret in your GitHub repository settings under Settings > Secrets > Actions."
             exit 1
@@ -151,7 +153,7 @@ jobs:
         uses: packit/upload-to-copr@v1 # A common, reliable action for COPR submission
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' # Only run on push/manual trigger
         with:
-          copr_project: 'stevensko/winboat' 
+          copr_project: 'stevensko/WinBoat' 
           files: ${{ steps.generate_srpm.outputs.SRPM_FILE_PATH }} 
           token: ${{ secrets.COPR_API_TOKEN }} # <<<--- Uses the secret you must define in GitHub
           preserve_project: true # Keeps the existing COPR project structure
